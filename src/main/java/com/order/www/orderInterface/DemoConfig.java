@@ -81,7 +81,7 @@ public class DemoConfig extends JFinalConfig {
 
 		me.add(arp);*/
 		me.add(new SwaggerPlugin(new SwaggerDoc().setBasePath("/").setHost("127.0.0.1").setSwagger("2.0")
-				.setInfo(new SwaggerApiInfo("jfinal swagger demo", "1.0", "jfinal swagger", ""))));
+				.setInfo(new SwaggerApiInfo("订单集成项目", "1.0", "订单集成项目接口文档", ""))));
 //		me.add(new SwaggerPlugin(new SwaggerDoc()));
 	}
 	
