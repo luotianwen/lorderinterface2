@@ -8,6 +8,11 @@ import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.server.undertow.UndertowServer;
 import com.jfinal.template.Engine;
+import com.order.www.orderInterface.routes.FrontApiRoutes;
+import live.autu.plugin.jfinal.swagger.config.SwaggerPlugin;
+import live.autu.plugin.jfinal.swagger.config.routes.SwaggerRoutes;
+import live.autu.plugin.jfinal.swagger.model.SwaggerApiInfo;
+import live.autu.plugin.jfinal.swagger.model.SwaggerDoc;
 
 /**
  */
@@ -54,7 +59,8 @@ public class DemoConfig extends JFinalConfig {
 	 * 配置路由
 	 */
 	public void configRoute(Routes me) {
-		 me.add("/", InterfaceController.class);
+		 me.add(new SwaggerRoutes());
+		 me.add(new FrontApiRoutes());
 
 	}
 	
@@ -74,6 +80,9 @@ public class DemoConfig extends JFinalConfig {
 		ActiveRecordPlugin arp = new ActiveRecordPlugin(druidPlugin);
 
 		me.add(arp);*/
+		me.add(new SwaggerPlugin(new SwaggerDoc().setBasePath("/").setHost("127.0.0.1").setSwagger("2.0")
+				.setInfo(new SwaggerApiInfo("jfinal swagger demo", "1.0", "jfinal swagger", ""))));
+//		me.add(new SwaggerPlugin(new SwaggerDoc()));
 	}
 	
 	public static DruidPlugin createDruidPlugin() {
