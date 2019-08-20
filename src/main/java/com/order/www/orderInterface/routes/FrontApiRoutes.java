@@ -2,7 +2,8 @@ package com.order.www.orderInterface.routes;
 
 
 import com.jfinal.config.Routes;
-import com.order.www.orderInterface.InterfaceController;
+import com.order.www.orderInterface.controller.InterfaceController;
+import com.order.www.orderInterface.controller.OrderController;
 
 public class FrontApiRoutes extends Routes {
 
@@ -10,6 +11,7 @@ public class FrontApiRoutes extends Routes {
     public void config() {
 
         add("/", InterfaceController.class);
+        add("/order", OrderController.class);
     }
 
 }

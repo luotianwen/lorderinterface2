@@ -3,10 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.order.www</groupId>
-	<artifactId>orderInterface</artifactId>
+	<artifactId>orderInterface2</artifactId>
 	<version>1.0.0</version>
 
-	<name>orderInterface</name>
+	<name>orderInterface2</name>
 
   <packaging>jar</packaging>
 
@@ -68,7 +68,7 @@
     	<artifactId>jfinal</artifactId>
     	<version>4.3</version>
     </dependency>
-    
+
     <!-- 避免控制台输出如下提示信息：
 		 SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
 		 项目中实际上用不到这个 jar 包，本 jfinal demo 用不上这个依赖，在此仅为大家
@@ -99,9 +99,9 @@
 		<version>1.0.29</version>
 	</dependency>
 	  <dependency>
-		  <groupId>live.autu</groupId>
-		  <artifactId>jfinal-swagger</artifactId>
-		  <version>1.0.0</version>
+		  <groupId>commons-io</groupId>
+		  <artifactId>commons-io</artifactId>
+		  <version>2.5</version>
 	  </dependency>
    <!-- <dependency>
     	<groupId>com.jfinal</groupId>

@@ -9,10 +9,10 @@ import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.server.undertow.UndertowServer;
 import com.jfinal.template.Engine;
 import com.order.www.orderInterface.routes.FrontApiRoutes;
-import live.autu.plugin.jfinal.swagger.config.SwaggerPlugin;
-import live.autu.plugin.jfinal.swagger.config.routes.SwaggerRoutes;
-import live.autu.plugin.jfinal.swagger.model.SwaggerApiInfo;
-import live.autu.plugin.jfinal.swagger.model.SwaggerDoc;
+import top.hequehua.swagger.config.SwaggerPlugin;
+import top.hequehua.swagger.handler.WebJarsHandler;
+import top.hequehua.swagger.model.SwaggerDoc;
+import top.hequehua.swagger.routes.MySwaggerRoutes;
 
 /**
  */
@@ -59,7 +59,7 @@ public class DemoConfig extends JFinalConfig {
 	 * 配置路由
 	 */
 	public void configRoute(Routes me) {
-		 me.add(new SwaggerRoutes());
+		 me.add(new MySwaggerRoutes());
 		 me.add(new FrontApiRoutes());
 
 	}
@@ -72,16 +72,18 @@ public class DemoConfig extends JFinalConfig {
 	 * 配置插件
 	 */
 	public void configPlugin(Plugins me) {
-		/*// 配置 druid 数据库连接池插件
+		// 配置 druid 数据库连接池插件
 		DruidPlugin druidPlugin = new DruidPlugin(p.get("jdbcUrl"), p.get("user"), p.get("password").trim());
 		me.add(druidPlugin);
 		
 		// 配置ActiveRecord插件
 		ActiveRecordPlugin arp = new ActiveRecordPlugin(druidPlugin);
 
-		me.add(arp);*/
-		me.add(new SwaggerPlugin(new SwaggerDoc().setBasePath("/").setHost("127.0.0.1").setSwagger("2.0")
-				.setInfo(new SwaggerApiInfo("订单集成项目", "1.0", "订单集成项目接口文档", ""))));
+		me.add(arp);
+		me.add(new SwaggerPlugin(true).addSwaggerDoc(new SwaggerDoc("127.0.0.1:8082","com.order.www.orderInterface.controller","订单集成项目接口文档")));
+
+	/*	me.add(new SwaggerPlugin(new SwaggerDoc().setBasePath("/").setHost("127.0.0.1:8082").setSwagger("2.0")
+				.setInfo(new SwaggerApiInfo("订单集成项目", "1.0", "订单集成项目接口文档", ""))));*/
 //		me.add(new SwaggerPlugin(new SwaggerDoc()));
 	}
 	
@@ -102,6 +104,6 @@ public class DemoConfig extends JFinalConfig {
 	 * 配置处理器
 	 */
 	public void configHandler(Handlers me) {
-		
+		me.add(new WebJarsHandler());
 	}
 }
