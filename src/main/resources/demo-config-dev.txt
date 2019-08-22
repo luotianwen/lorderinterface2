@@ -3,3 +3,13 @@ jdbcUrl = jdbc:mysql://localhost:3306/order?characterEncoding=utf8&useSSL=false&
 user = root
 password =root
 devMode = true
+
+KEY=sss
+
+
+#莲香岛信息（平台）
+lxd.From=Platform@0
+lxd.Key=FBF98310-3607-4D99-80D1-406A1D3CC745
+#众生平安科技（供应商）
+zs.From=Supplier@0
+zs.Key=FBF98310-3607-4D99-80D1-406A1D3CC746

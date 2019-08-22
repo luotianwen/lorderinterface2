@@ -1,0 +1,5 @@
+cron4j=task1
+task1.cron=04 11 * * *
+task1.class=com.order.www.orderInterface.task.OrderCronTask
+task1.daemon=true
+task1.enable=true
