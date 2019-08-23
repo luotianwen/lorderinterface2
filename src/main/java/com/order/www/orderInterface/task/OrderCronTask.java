@@ -17,33 +17,9 @@ public class OrderCronTask implements Runnable {
         log.info("order task  begin");
         Map map = new HashMap();
         map.put("Number", "100");
-        String json="{\n" +
-                "\t\"Status\": 200,\n" +
-                "\t\"Msg\": \"ok\",\n" +
-                "\t\"Result\": {\n" +
-                "\t\t\"Total\": 1,\n" +
-                "\t\t\"Surplus\": 100,\n" +
-                "\t\t\"List\": [{\n" +
-                "\t\t\t\"OrderID\": \"LD201904221639537911111\",\n" +
-                "\t\t\t\"ReceiveName\": \"test\",\n" +
-                "\t\t\t\"Mobile\": \"13888888888\",\n" +
-                "\t\t\t\"CardCode\": \"\",\n" +
-                "\t\t\t\"DocDueDate\": \"2019-5-6\",\n" +
-                "\t\t\t\"OrderAddress\": \"北京市朝阳区某街道某号楼\",\n" +
-                "\t\t\t\"ProName\": \"北京市\",\n" +
-                "\t\t\t\"CityName\": \"北京市\",\n" +
-                "\t\t\t\"DisName\": \"朝阳区\",\n" +
-                "\t\t\t\"UserID\": \"12345\",\n" +
-                "\t\t\t\"Remark\": \"test\",\n" +
-                "\t\t\t\"Items\": [{\n" +
-                "\t\t\t\t\"ItemCode\": \"88888888\",\n" +
-                "\t\t\t\t\"QuanTity\": 1,\n" +
-                "\t\t\t\t\"Price\": 10.00\n" +
-                "\t\t\t}]\n" +
-                "\t\t}]\n" +
-                "\t}\n" +
-                "}";
-       // String json = OrderStatic.lxdpost(OrderStatic.SendOrder, map);
+        //String json="{\"Status\":200,\"Result\":{\"Total\":7,\"Surplus\":0,\"List\":[{\"OrderID\":\"LD201907091443107423814\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/9 14:43:17\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"899335\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907101046030277325\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/10 10:46:04\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"899850\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907101047021791306\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/10 10:47:04\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"899335\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907101050389833337\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/10 10:50:39\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"899521\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907241744437446397\",\"ReceiveName\":\"vbb\",\"Mobile\":\"16689876567\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/24 17:44:43\",\"OrderAddress\":\"宝宝不会后悔\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"西城区\",\"UserID\":\"74301\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"899334\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907251740289939288\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/25 17:40:30\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"889041\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907251741405318426\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/25 17:41:42\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"889041\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]}]},\"Msg\":\"成功\"}";
+        String json = OrderStatic.lxdpost(OrderStatic.SendOrder, map);
+        System.out.println(json);
         ResponseEntity<OrderBean> datas = JSON.parseObject(json, new TypeReference<ResponseEntity<OrderBean>>(ResponseEntity.class, OrderBean.class, OrderEntity.class) {
         });
         if (datas.getStatus() != 200) {

@@ -1,7 +1,12 @@
 package com.order.www.orderInterface.common;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.jfinal.kit.HttpKit;
 import com.jfinal.kit.PropKit;
+import com.order.www.orderInterface.entity.OrderBean;
+import com.order.www.orderInterface.entity.OrderEntity;
+import com.order.www.orderInterface.entity.ResponseEntity;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -50,7 +55,7 @@ public class OrderStatic {
         //随机数+空格+MD5（MD5（KEY）+随机数）
         int r=new Random().nextInt();
         String keys=PropKit.get("lxd.Key");
-        String key=r+" "+ md5(md5(keys)+r);
+        String key=r+" "+ md5(md5(keys).toUpperCase()+r).toUpperCase();
         headers.put("Authorization",key);
         System.out.println(headers.toString());
         return post(url,params,headers);

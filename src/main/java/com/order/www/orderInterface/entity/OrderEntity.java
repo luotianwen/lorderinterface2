@@ -1,5 +1,7 @@
 package com.order.www.orderInterface.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +12,7 @@ public class OrderEntity implements Serializable {
     private String receiveName;
     private String mobile;
     private String cardCode;
+    @JSONField(format="yyyy/mm/DD HH:mm:ss")
     private Date docDueDate;
     private String orderAddress;
     private String proName;
