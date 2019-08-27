@@ -17,6 +17,7 @@ import com.order.www.orderInterface.entity.OrderEntity;
 import com.order.www.orderInterface.entity.ResponseEntity;
 import com.order.www.orderInterface.entity._MappingKit;
 import com.order.www.orderInterface.routes.FrontApiRoutes;
+import com.order.www.orderInterface.task.OrderBatchTask;
 import com.order.www.orderInterface.task.OrderCronTask;
 import top.hequehua.swagger.config.SwaggerPlugin;
 import top.hequehua.swagger.handler.WebJarsHandler;
@@ -44,7 +45,7 @@ public class DemoConfig extends JFinalConfig {
 	public void onStart() {
 
 		super.onStart();
-      new OrderCronTask().run();
+      new OrderBatchTask().run();
 	}
 
 	/**

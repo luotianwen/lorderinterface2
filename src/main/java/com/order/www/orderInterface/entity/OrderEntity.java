@@ -20,6 +20,16 @@ public class OrderEntity implements Serializable {
     private String disName;
     private String userID;
     private String remark;
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     private java.util.List<ItemsBean> items;
 
     public String getOrderID() {
@@ -128,6 +138,15 @@ public class OrderEntity implements Serializable {
         private String itemCode;
         private int quanTity;
         private double price;
+        private String product;
+
+        public String getProduct() {
+            return product;
+        }
+
+        public void setProduct(String product) {
+            this.product = product;
+        }
 
         public String getItemCode() {
             return itemCode;

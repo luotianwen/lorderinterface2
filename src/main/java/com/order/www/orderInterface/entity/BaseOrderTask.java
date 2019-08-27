@@ -39,15 +39,15 @@ public abstract class BaseOrderTask<M extends BaseOrderTask<M>> extends Model<M>
 	/**
 	 * 订单集成单号
 	 */
-	public void setPoolTaskNo(java.lang.Integer poolTaskNo) {
+	public void setPoolTaskNo(java.lang.String poolTaskNo) {
 		set("pool_task_no", poolTaskNo);
 	}
 	
 	/**
 	 * 订单集成单号
 	 */
-	public java.lang.Integer getPoolTaskNo() {
-		return getInt("pool_task_no");
+	public java.lang.String getPoolTaskNo() {
+		return getStr("pool_task_no");
 	}
 
 	/**
@@ -119,7 +119,19 @@ public abstract class BaseOrderTask<M extends BaseOrderTask<M>> extends Model<M>
 	public java.lang.Integer getTaskStatus() {
 		return getInt("task_status");
 	}
+	/**
+	 * 状态最后改变时间
+	 */
+	public void setCreateDate(java.util.Date statusChangeDatetime) {
+		set("create_date", statusChangeDatetime);
+	}
 
+	/**
+	 * 状态最后改变时间
+	 */
+	public java.util.Date getCreateDate() {
+		return get("create_date");
+	}
 	/**
 	 * 状态最后改变时间
 	 */

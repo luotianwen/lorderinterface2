@@ -40,15 +40,15 @@ public abstract class BaseTaskLine<M extends BaseTaskLine<M>> extends Model<M> i
 	/**
 	 * 订单集成单号
 	 */
-	public void setPoolTaskNo(java.lang.Integer poolTaskNo) {
+	public void setPoolTaskNo(java.lang.String poolTaskNo) {
 		set("pool_task_no", poolTaskNo);
 	}
 	
 	/**
 	 * 订单集成单号
 	 */
-	public java.lang.Integer getPoolTaskNo() {
-		return getInt("pool_task_no");
+	public java.lang.String getPoolTaskNo() {
+		return getStr("pool_task_no");
 	}
 
 	/**

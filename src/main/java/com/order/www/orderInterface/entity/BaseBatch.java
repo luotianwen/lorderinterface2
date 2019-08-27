@@ -20,15 +20,15 @@ public abstract class BaseBatch<M extends BaseBatch<M>> extends Model<M> impleme
 	/**
 	 * 批次号，订单汇集时生成的编号
 	 */
-	public void setPoolBatch(java.lang.String poolBatch) {
-		set("POOL_BATCH", poolBatch);
+	public void setBatchNum(java.lang.String poolBatch) {
+		set("BATCH_NUM", poolBatch);
 	}
 	
 	/**
 	 * 批次号，订单汇集时生成的编号
 	 */
-	public java.lang.String getPoolBatch() {
-		return getStr("POOL_BATCH");
+	public java.lang.String getBatchNum() {
+		return getStr("BATCH_NUM");
 	}
 
 	/**
