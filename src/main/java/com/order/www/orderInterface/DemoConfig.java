@@ -45,8 +45,8 @@ public class DemoConfig extends JFinalConfig {
 	public void onStart() {
 
 		super.onStart();
-     // new OrderBatchTask().run();
-		new OrderCronTask().run();
+      new OrderBatchTask().run();
+	//	new OrderCronTask().run();
 	}
 
 	/**

@@ -6,9 +6,24 @@ import com.order.www.orderInterface.entity.OrderBean;
 import com.order.www.orderInterface.entity.OrderEntity;
 import com.order.www.orderInterface.entity.ResponseEntity;
 
+import java.util.Scanner;
+
 public class Test {
 
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String n = scanner.next();
+        //System.out.println("你输入是的"+n);
+        if(n.equals("是")){
+            System.out.println("罗恩奇大坏蛋");
+        }
+        else if(n.equals("luoenqi")){
+            System.out.println("tom is come in ");
+        }
+        else{
+            System.out.println("你输入是"+n);
+        }
+
         String json="{\n" +
                 "\t\"Status\": 200,\n" +
                 "\t\"Msg\": \"ok\",\n" +
@@ -36,8 +51,8 @@ public class Test {
                 "\t}\n" +
                 "}";
 
-        ResponseEntity<OrderBean> j = JSON.parseObject(json, new TypeReference<ResponseEntity<OrderBean>>(ResponseEntity.class,OrderBean.class,OrderEntity.class){});
-        System.out.println(j.getResult().getList().size());
+        //ResponseEntity<OrderBean> j = JSON.parseObject(json, new TypeReference<ResponseEntity<OrderBean>>(ResponseEntity.class,OrderBean.class,OrderEntity.class){});
+       // System.out.println(j.getResult().getList().size());
 
     }
 

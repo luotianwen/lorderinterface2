@@ -20,14 +20,86 @@ public class OrderEntity implements Serializable {
     private String disName;
     private String userID;
     private String remark;
-    private String type;
+    private String orderClass;
+    private int activityType;
+    private String activityTypeName;
+    private int activityID;
+    private String activityName;
+    private int createUserID;
+    private String createUserName;
+    private int couponID;
+    private String couponName;
 
-    public String getType() {
-        return type;
+    public String getOrderClass() {
+        return orderClass;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setOrderClass(String orderClass) {
+        this.orderClass = orderClass;
+    }
+
+    public int getActivityType() {
+        return activityType;
+    }
+
+    public void setActivityType(int activityType) {
+        this.activityType = activityType;
+    }
+
+    public String getActivityTypeName() {
+        return activityTypeName;
+    }
+
+    public void setActivityTypeName(String activityTypeName) {
+        this.activityTypeName = activityTypeName;
+    }
+
+    public int getActivityID() {
+        return activityID;
+    }
+
+    public void setActivityID(int activityID) {
+        this.activityID = activityID;
+    }
+
+    public String getActivityName() {
+        return activityName;
+    }
+
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
+    }
+
+    public int getCreateUserID() {
+        return createUserID;
+    }
+
+    public void setCreateUserID(int createUserID) {
+        this.createUserID = createUserID;
+    }
+
+    public String getCreateUserName() {
+        return createUserName;
+    }
+
+    public void setCreateUserName(String createUserName) {
+        this.createUserName = createUserName;
+    }
+
+    public int getCouponID() {
+        return couponID;
+    }
+
+    public void setCouponID(int couponID) {
+        this.couponID = couponID;
+    }
+
+    public String getCouponName() {
+        return couponName;
+    }
+
+    public void setCouponName(String couponName) {
+        this.couponName = couponName;
     }
 
     private java.util.List<ItemsBean> items;
@@ -138,14 +210,23 @@ public class OrderEntity implements Serializable {
         private String itemCode;
         private int quanTity;
         private double price;
-        private String product;
+        private String productName;
+        private double  score;
 
-        public String getProduct() {
-            return product;
+        public String getProductName() {
+            return productName;
         }
 
-        public void setProduct(String product) {
-            this.product = product;
+        public void setProductName(String productName) {
+            this.productName = productName;
+        }
+
+        public double getScore() {
+            return score;
+        }
+
+        public void setScore(double score) {
+            this.score = score;
         }
 
         public String getItemCode() {

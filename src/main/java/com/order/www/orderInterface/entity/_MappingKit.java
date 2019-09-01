@@ -20,6 +20,7 @@ public class _MappingKit {
 		arp.addMapping("pool_batch_line", "id", BatchLine.class);
 		arp.addMapping("pool_task", "id", OrderTask.class);
 		arp.addMapping("pool_task_line", "id", TaskLine.class);
+		arp.addMapping("pool_json", "id", OrderJson.class);
 	}
 }
 
