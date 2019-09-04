@@ -45,8 +45,8 @@ public class DemoConfig extends JFinalConfig {
 	public void onStart() {
 
 		super.onStart();
-      new OrderBatchTask().run();
-	//	new OrderCronTask().run();
+     // new OrderBatchTask().run();
+		//new OrderCronTask().run();
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class DemoConfig extends JFinalConfig {
 	 * 配置路由
 	 */
 	public void configRoute(Routes me) {
-		 me.add(new MySwaggerRoutes());
+		  me.add(new MySwaggerRoutes());
 		 me.add(new FrontApiRoutes());
 
 	}
@@ -94,7 +94,7 @@ public class DemoConfig extends JFinalConfig {
 	 * 配置插件
 	 */
 	public void configPlugin(Plugins me) {
-		// 配置 druid 数据库连接池插件
+		/*// 配置 druid 数据库连接池插件
 		DruidPlugin druidPlugin = new DruidPlugin(p.get("jdbcUrl"), p.get("user"), p.get("password").trim());
 		me.add(druidPlugin);
 		// 配置ActiveRecord插件
@@ -104,7 +104,7 @@ public class DemoConfig extends JFinalConfig {
 
 		me.add(new SwaggerPlugin(true).addSwaggerDoc(new SwaggerDoc("127.0.0.1:8082","com.order.www.orderInterface.controller","订单集成项目接口文档")));
 		Cron4jPlugin cp = new Cron4jPlugin("config.txt", "cron4j");
-		me.add(cp);
+		me.add(cp);*/
 	}
 	
 	public static DruidPlugin createDruidPlugin() {
