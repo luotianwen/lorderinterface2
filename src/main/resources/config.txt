@@ -1,5 +1,10 @@
-cron4j=task1
-task1.cron=04 11 * * *
+cron4j=task1,task2
+task1.cron=04 00 * * *
 task1.class=com.order.www.orderInterface.task.OrderCronTask
 task1.daemon=true
 task1.enable=true
+
+task2.cron=04 01 * * *
+task2.class=com.order.www.orderInterface.task.OrderBatchTask
+task2.daemon=true
+task2.enable=true

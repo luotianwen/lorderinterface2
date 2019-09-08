@@ -34,7 +34,7 @@ public class OrderController extends Controller {
 		String ip="219.237.112.11";
 		//String ip="222.129.19.230";//getIpAddress(getRequest());
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
-		String code= sdf.format(new Date());
+		String code= "201908"+sdf.format(new Date());//LD20190829 1024 0712 92071
 		System.out.println(new KdGoldAPIDemo().orderOnlineByJson(code));
 		System.out.println("ip:"+ip);
 		String jsonResult = new Test().getPrintParam(ip,code);

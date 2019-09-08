@@ -1,5 +1,8 @@
 package com.order.www.orderInterface;
 
+import com.alibaba.fastjson.JSON;
+import com.order.www.orderInterface.entity.SearchData;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,122 +11,58 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.security.MessageDigest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
- * 快递鸟电子面单接口
+ * 快递鸟物流轨迹即时查询接口
  *
- * @技术QQ群: 340378554
- * @see: http://kdniao.com/api-eorder
+ * @技术QQ群: 456320272
+ * @see: http://www.kdniao.com/YundanChaxunAPI.aspx
  * @copyright: 深圳市快金数据技术服务有限公司
  *
- * ID和Key请到官网申请：http://kdniao.com/reg
+ * DEMO中的电商ID与私钥仅限测试使用，正式环境请单独注册账号
+ * 单日超过500单查询量，建议接入我方物流轨迹订阅推送接口
+ *
+ * ID和Key请到官网申请：http://www.kdniao.com/ServiceApply.aspx
  */
 
-public class KdGoldAPIDemo {
+public class KdniaoTrackQueryAPI {
+
+    //DEMO
+    public static void main(String[] args) {
+        KdniaoTrackQueryAPI api = new KdniaoTrackQueryAPI();
+        try {
+            String result = api.getOrderTracesByJson("STO", "772002073484106");
+            SearchData orderReturn= JSON.parseObject(result, SearchData.class);
+            System.out.print(orderReturn.getState());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     //电商ID
     private String EBusinessID="1568694";
     //电商加密私钥，快递鸟提供，注意保管，不要泄漏
     private String AppKey="6fa5b21e-aa89-4fc1-bbb9-6becd32d7685";
-    //请求url, 正式环境地址：http://api.kdniao.com/api/Eorderservice    测试环境地址：http://testapi.kdniao.com:8081/api/EOrderService
-    private String ReqURL="http://api.kdniao.com/api/Eorderservice";
+    //请求url
+    private String ReqURL="http://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx";
 
-    public static void main(String[] args) {
-        try {
-            SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
-            String code= sdf.format(new Date());
-             System.out.println(new KdGoldAPIDemo().orderOnlineByJson(code));
-          //  String jsonResult = new Test().getPrintParam("219.237.112.6",code);
-          //  System.out.println(jsonResult);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     /**
-     * Json方式 电子面单
+     * Json方式 查询订单物流轨迹
      * @throws Exception
-     *  <!--圆通快递信息(测试)-->
-     *     <!--<add key="clientID" value="K21000119"/>
-     *     <add key="partnerID" value="u2Z1F7Fh"/>
-     *     <add key="ytoUrl" value="http://58.32.246.71:8000/CommonOrderModeBPlusServlet.action"/>-->
-     *     <!--圆通快递信息(生产环境)-->
-     *     <add key="clientID" value="K100533161"/>
-     *     <add key="partnerID" value="7tqDcFSw"/>
-     *     <add key="ytoUrl" value="http://customerewms.yto.net.cn/CommonOrderModeBPlusServlet.action"/>
-     *     <!--申通快递信息(测试)-->
-     *     <!--<add key="siteName" value="上海陈行公司" />
-     *     <add key="customerName" value="李客户1" />
-     *     <add key="customerPwd" value="392140" />
-     *     <add key="cusOrder" value="http://222.72.44.130:8083/cusOrder" />
-     *     <add key="getCusBalance" value="http://222.72.44.130:8085/getCusBalance" />
-     *     <add key="checkCusPwd" value="http://222.72.44.130:8085/checkCusPwd" />-->
-     *     <!--申通快递信息(生产环境)-->
-     *     <add key="siteName" value="北京平谷公司"/>
-     *     <add key="customerName" value="莲香岛"/>
-     *     <add key="customerPwd" value="575757"/>
-     *     <add key="cusOrder" value="http://waybill-get.sto-express.cn:9091/cusOrder"/>
-     *     <add key="getCusBalance" value="http://waybill-apply.sto-express.cn:9091"/>
-     *     <add key="checkCusPwd" value="http://waybill-apply.sto-express.cn:9091"/>
      */
-    public String orderOnlineByJson(String code) throws Exception{
-        String scs[]={"STO","YTO","DBL"};
-        int i=2;//new Random().nextInt(1);
-        String CustomerName="莲香岛";
-        String CustomerPwd="575757";
-        String MonthCode="";
-        String SendSite="北京平谷公司";
-        String TemplateSize="180";
-         if(i==1){
-            CustomerName="K100533161";
-            CustomerPwd="7tqDcFSw11";
-            SendSite="";
-            MonthCode="7tqDcFSw11";
-              TemplateSize="180";
-         }
-          else if(i==2){
-             CustomerName="18612639205";
-            CustomerPwd="";
-            SendSite="";
-            MonthCode="";
-        }
-        String requestData= "{'OrderCode':'"+code+"'," +
-                "'ShipperCode':'"+scs[i]+"'," +
+    public String getOrderTracesByJson(String expCode, String expNo) throws Exception{
+        String requestData= "{'OrderCode':'','ShipperCode':'" + expCode + "','LogisticCode':'" + expNo + "'}";
 
-                "'CustomerName':'"+CustomerName+"'," +
-                "'CustomerPwd':'"+CustomerPwd+"'," +
-                "'SendSite':'"+SendSite+"'," +
-                "'MonthCode':'"+MonthCode+"'," +
-
-                "'PayType':3," +
-                "'ExpType':1," +
-                "'Cost':1.0," +
-                "'OtherCost':1.0," +
-                "'Sender':" +
-                "{" +
-                "'Company':'LV','Name':'Taylor','Mobile':'15018442396','ProvinceName':'上海','CityName':'上海','ExpAreaName':'青浦区','Address':'明珠路73号'}," +
-                "'Receiver':" +
-                "{" +
-                "'Company':'GCCUI','Name':'Yann','Mobile':'15018442396','ProvinceName':'北京','CityName':'北京','ExpAreaName':'朝阳区','Address':'三里屯街道雅秀大厦'}," +
-                "'Commodity':" +
-                "[{" +
-                "'GoodsName':'鞋子','Goodsquantity':1,'GoodsWeight':1.0}]," +
-                "'Weight':1.0," +
-                "'Quantity':1," +
-                "'Volume':0.0," +
-                "'TemplateSize':"+TemplateSize+"," +
-                "'Remark':'小心轻放'," +
-                "'IsReturnPrintTemplate':1}";
-        System.out.println(requestData);
         Map<String, String> params = new HashMap<String, String>();
         params.put("RequestData", urlEncoder(requestData, "UTF-8"));
         params.put("EBusinessID", EBusinessID);
-        params.put("RequestType", "1007");
+        params.put("RequestType", "1002");
         String dataSign=encrypt(requestData, AppKey, "UTF-8");
         params.put("DataSign", urlEncoder(dataSign, "UTF-8"));
         params.put("DataType", "2");
@@ -134,6 +73,7 @@ public class KdGoldAPIDemo {
 
         return result;
     }
+
     /**
      * MD5加密
      * @param str 内容
@@ -163,7 +103,7 @@ public class KdGoldAPIDemo {
      * @throws UnsupportedEncodingException
      */
     private String base64(String str, String charset) throws UnsupportedEncodingException{
-        String encoded = Base64.encode(str.getBytes(charset));
+        String encoded = base64Encode(str.getBytes(charset));
         return encoded;
     }
 
@@ -229,9 +169,9 @@ public class KdGoldAPIDemo {
                     param.append(entry.getKey());
                     param.append("=");
                     param.append(entry.getValue());
-                    System.out.println(entry.getKey()+":"+entry.getValue());
+                    //System.out.println(entry.getKey()+":"+entry.getValue());
                 }
-                System.out.println("param:"+param.toString());
+                //System.out.println("param:"+param.toString());
                 out.write(param.toString());
             }
             // flush输出流的缓冲
@@ -262,4 +202,48 @@ public class KdGoldAPIDemo {
         }
         return result.toString();
     }
+
+
+    private static char[] base64EncodeChars = new char[] {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+            'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+            'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+            'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+            'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+            'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+            'w', 'x', 'y', 'z', '0', '1', '2', '3',
+            '4', '5', '6', '7', '8', '9', '+', '/' };
+
+    public static String base64Encode(byte[] data) {
+        StringBuffer sb = new StringBuffer();
+        int len = data.length;
+        int i = 0;
+        int b1, b2, b3;
+        while (i < len) {
+            b1 = data[i++] & 0xff;
+            if (i == len)
+            {
+                sb.append(base64EncodeChars[b1 >>> 2]);
+                sb.append(base64EncodeChars[(b1 & 0x3) << 4]);
+                sb.append("==");
+                break;
+            }
+            b2 = data[i++] & 0xff;
+            if (i == len)
+            {
+                sb.append(base64EncodeChars[b1 >>> 2]);
+                sb.append(base64EncodeChars[((b1 & 0x03) << 4) | ((b2 & 0xf0) >>> 4)]);
+                sb.append(base64EncodeChars[(b2 & 0x0f) << 2]);
+                sb.append("=");
+                break;
+            }
+            b3 = data[i++] & 0xff;
+            sb.append(base64EncodeChars[b1 >>> 2]);
+            sb.append(base64EncodeChars[((b1 & 0x03) << 4) | ((b2 & 0xf0) >>> 4)]);
+            sb.append(base64EncodeChars[((b2 & 0x0f) << 2) | ((b3 & 0xc0) >>> 6)]);
+            sb.append(base64EncodeChars[b3 & 0x3f]);
+        }
+        return sb.toString();
+    }
 }
+
