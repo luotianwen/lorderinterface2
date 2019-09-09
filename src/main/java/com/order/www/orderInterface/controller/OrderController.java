@@ -27,12 +27,12 @@ import java.util.UUID;
 public class OrderController extends Controller {
 	@Inject
 	OrderService orderService;
-	@ApiOperation(tags="GetTransfer", methods= RequestMethod.GET,produces = "application/json")
-	@ApiParams({
+	@ApiOperation(tags="GetTransfer", methods= RequestMethod.GET,produces = "application/json",description ="分账信息" )
+	/*@ApiParams({
 			@ApiParam(name="userName",required=false,description="分账信息")
-	})
+	})*/
 	@ApiResponses({
-			@ApiResponse(code ="msg",message = "内容")
+			@ApiResponse(code ="state",message = "状态 ok 为成功")
 
 	})
 	public void GetTransfer() throws Exception {
@@ -59,11 +59,12 @@ public class OrderController extends Controller {
 	/*
 	  * 物流信息订阅
 	 */
-	public void subcript() throws Exception {
+	public void subscript() throws Exception {
 		String result=getRawData();
 		System.out.println(result);
-		PushData orderReturn= JSON.parseObject(result, PushData.class);
-		renderJson(orderReturn);
+		SearchData searchData= JSON.parseObject(result, SearchData.class);
+		orderService.subscript(searchData);
+		renderJson(Ret.ok());
 	}
 	/**
 	 * 获取请求主机IP地址,如果通过代理进来，则透过防火墙获取真实IP地址;

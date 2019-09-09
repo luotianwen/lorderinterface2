@@ -227,4 +227,19 @@ public class OrderService {
         tl.update();
 
     }
+
+    @Before(Tx.class)
+    public void subscript(SearchData searchData) {
+        if(searchData.isSuccess()){
+//物流状态: 0-无轨迹，1-已揽收，2-在途中，3-签收,4-问题件
+            if(3==searchData.getState()) {
+                Db.update("update pool_task  set recall_status=? where carriers like '%?%'", "1", searchData.getLogisticCode());
+            }
+            else if(4==searchData.getState()){
+                Db.update("update pool_task  set recall_status=? where carriers like '%?%'", "2", searchData.getLogisticCode());
+            }
+            String id=UUID.randomUUID().toString().replace("-", "");
+            Db.update("insert into pool_logistic values(?,?,?,?)",id,searchData.getLogisticCode(),JSON.toJSON(searchData),new Date());
+        }
+    }
 }
