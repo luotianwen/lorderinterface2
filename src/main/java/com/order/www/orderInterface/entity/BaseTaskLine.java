@@ -446,15 +446,15 @@ public abstract class BaseTaskLine<M extends BaseTaskLine<M>> extends Model<M> i
 	/**
 	 * 门店分润税率
 	 */
-	public void setProfitStoreRatesv(java.math.BigDecimal profitStoreRatesv) {
-		set("profit_store_ratesv", profitStoreRatesv);
+	public void setProfitStoreRates(java.math.BigDecimal profitStoreRates) {
+		set("profit_store_rates", profitStoreRates);
 	}
 	
 	/**
 	 * 门店分润税率
 	 */
-	public java.math.BigDecimal getProfitStoreRatesv() {
-		return get("profit_store_ratesv");
+	public java.math.BigDecimal getProfitStoreRates() {
+		return get("profit_store_rates");
 	}
 
 	/**

@@ -1,10 +1,16 @@
 package com.order.www.orderInterface.controller;
 
 
+import com.alibaba.fastjson.JSON;
+import com.jfinal.aop.Inject;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.Ret;
 import com.order.www.orderInterface.KdGoldAPIDemo;
 import com.order.www.orderInterface.Test;
+import com.order.www.orderInterface.entity.PushData;
+import com.order.www.orderInterface.entity.SearchData;
+import com.order.www.orderInterface.entity.TransferData;
+import com.order.www.orderInterface.service.OrderService;
 import top.hequehua.swagger.annotation.*;
 import top.hequehua.swagger.config.RequestMethod;
 
@@ -19,16 +25,25 @@ import java.util.UUID;
  */
 @Api( tags="order", description = "订单接口")
 public class OrderController extends Controller {
-
-
-	@ApiOperation(tags="order", methods= RequestMethod.GET,produces = "application/json")
+	@Inject
+	OrderService orderService;
+	@ApiOperation(tags="GetTransfer", methods= RequestMethod.GET,produces = "application/json")
 	@ApiParams({
-			@ApiParam(name="userName",required=false,description="测试参数")
+			@ApiParam(name="userName",required=false,description="分账信息")
 	})
 	@ApiResponses({
-			@ApiResponse(code ="msg",message = "内容"),
-			@ApiResponse(code ="userName",message = "名称")
+			@ApiResponse(code ="msg",message = "内容")
+
 	})
+	public void GetTransfer() throws Exception {
+		String result=getRawData();
+		System.out.println(result);
+		TransferData orderReturn= JSON.parseObject(result, TransferData.class);
+
+		orderService.GetTransfer(orderReturn);
+		renderJson(Ret.ok());
+	}
+
 
 	public void print() throws Exception {
 		String ip="219.237.112.11";
@@ -40,6 +55,15 @@ public class OrderController extends Controller {
 		String jsonResult = new Test().getPrintParam(ip,code);
 		System.out.println(jsonResult);
 		renderJson(jsonResult);
+	}
+	/*
+	  * 物流信息订阅
+	 */
+	public void subcript() throws Exception {
+		String result=getRawData();
+		System.out.println(result);
+		PushData orderReturn= JSON.parseObject(result, PushData.class);
+		renderJson(orderReturn);
 	}
 	/**
 	 * 获取请求主机IP地址,如果通过代理进来，则透过防火墙获取真实IP地址;

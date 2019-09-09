@@ -12,6 +12,7 @@ public class FrontApiRoutes extends Routes {
 
         add("/", InterfaceController.class);
         add("/order", OrderController.class);
+        add("/print", OrderController.class,"/");
     }
 
 }

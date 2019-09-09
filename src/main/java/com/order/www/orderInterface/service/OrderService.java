@@ -2,10 +2,12 @@ package com.order.www.orderInterface.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.activerecord.tx.Tx;
 import com.order.www.orderInterface.common.OrderStatic;
 import com.order.www.orderInterface.entity.*;
 import com.order.www.orderInterface.task.OrderBatchTask;
@@ -31,9 +33,9 @@ public class OrderService {
                 ) {
             List<TaskLine> tls = TaskLine.dao.getTls(r.getStr("id"));
             //订单行数据超过一个物料的不做订单集成
-            if (tls.size() > 1 || tls.size() == 0) {
+           /* if (tls.size() > 1 || tls.size() == 0) {
                 continue;
-            }
+            }*/
             BigDecimal db = BigDecimal.ZERO;
             Date currentTime = new Date();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
@@ -49,23 +51,22 @@ public class OrderService {
                 newNum = Integer.parseInt(no1.substring(10, no1.length()));
             }
 
+            newNum++;
+            //数字长度为5位，长度不够数字前面补0
+            newStrNum = String.format("%05d", newNum);
+            no1 = dateString + newStrNum;
+            String no = no1;
+            String bid = UUID.randomUUID().toString().replaceAll("-", "");
+            Batch batch = new Batch();
+            batch.setId(bid);
+            batch.setBatchNum(no);
 
+            //batch.setBatchCreator();
+            batch.setBatchGenDatetime(new Date());
             for (TaskLine tl : tls
                     ) {
-                newNum++;
-                //数字长度为5位，长度不够数字前面补0
-                newStrNum = String.format("%05d", newNum);
-                no1 = dateString + newStrNum;
-                String no = no1;
-                String bid = UUID.randomUUID().toString().replaceAll("-", "");
+                db=db.add(tl.getRelievePrice());
                 String oid = UUID.randomUUID().toString().replaceAll("-", "");
-                Batch batch = new Batch();
-                batch.setId(bid);
-                batch.setBatchNum(no);
-                batch.setSumAmt(tl.getRelievePrice());
-                //batch.setBatchCreator();
-                batch.setBatchGenDatetime(new Date());
-
                 BatchLine bl = new BatchLine();
                 bl.setId(oid);
                 bl.setPoolBatchId(bid);
@@ -74,14 +75,16 @@ public class OrderService {
                 bl.setAMOUNT(tl.getAmount());
                 bl.setNAME(tl.getName());
                 Db.tx(() -> {
-                    batch.save();
                     bl.save();
                     Db.update("update pool_task_line set batch_num =? where id=?", no, tl.getId());
                     return true;
                 });
-
-
             }
+            batch.setSumAmt(db);
+            Db.tx(() -> {
+                batch.save();
+                return true;
+            });
         }
     }
 
@@ -195,5 +198,33 @@ public class OrderService {
 
             }
         }
+    }
+    @Before(Tx.class)
+    public void GetTransfer(TransferData transferData) {
+        List<TransferData.ItemBean> ibs=transferData.getItem();
+        TaskLine tl=TaskLine.dao.findFirst("select id from pool_task_line where task_no=? and product_no=?",transferData.getOrderID(),transferData.getItemCode());
+
+        for (TransferData.ItemBean ib:ibs
+             ) {
+            //用户类型 0 门店，1 代理商，2 供应商，3 平台，5 魅力合伙人
+            if(3==ib.getUserType()){
+                tl.setProfitLsdinfoAmount(new BigDecimal(ib.getAmount()));
+                tl.setProfitLsdinfoRates(new BigDecimal(ib.getProportion()));
+            }
+            else if(0==ib.getUserType()){
+                tl.setProfitStoreAmount(new BigDecimal(ib.getAmount()));
+                tl.setProfitStoreRates(new BigDecimal(ib.getProportion()));
+            }
+            else if(1==ib.getUserType()){
+                tl.setProfitLsdtechAmount(new BigDecimal(ib.getAmount()));
+                tl.setProfitLsdtechRates(new BigDecimal(ib.getProportion()));
+            }
+            else if(2==ib.getUserType()){
+                tl.setProfitSupplierAmount(new BigDecimal(ib.getAmount()));
+                tl.setProfitSupplierRates(new BigDecimal(ib.getProportion()));
+            }
+        }
+        tl.update();
+
     }
 }

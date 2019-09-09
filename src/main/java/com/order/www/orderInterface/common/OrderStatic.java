@@ -1,12 +1,8 @@
 package com.order.www.orderInterface.common;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.jfinal.kit.HttpKit;
+
 import com.jfinal.kit.PropKit;
-import com.order.www.orderInterface.entity.OrderBean;
-import com.order.www.orderInterface.entity.OrderEntity;
-import com.order.www.orderInterface.entity.ResponseEntity;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -16,7 +12,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import sun.security.provider.MD5;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
