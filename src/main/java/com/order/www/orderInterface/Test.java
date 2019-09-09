@@ -1,8 +1,8 @@
 package com.order.www.orderInterface;
 
 
-import com.sun.xml.internal.messaging.saaj.util.Base64;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.MessageDigest;

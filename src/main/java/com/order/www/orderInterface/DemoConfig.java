@@ -2,6 +2,7 @@ package com.order.www.orderInterface;
 
 
 import com.jfinal.config.*;
+import com.jfinal.ext.proxy.CglibProxyFactory;
 import com.jfinal.kit.Prop;
 import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
@@ -52,6 +53,7 @@ public class DemoConfig extends JFinalConfig {
 	 * 配置常量
 	 */
 	public void configConstant(Constants me) {
+		me.setProxyFactory(new CglibProxyFactory());
 		loadConfig();
 		
 		me.setDevMode(p.getBoolean("devMode", false));

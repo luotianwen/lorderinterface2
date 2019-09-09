@@ -27,7 +27,7 @@ import java.util.UUID;
 public class OrderController extends Controller {
 	@Inject
 	OrderService orderService;
-	@ApiOperation(tags="GetTransfer", methods= RequestMethod.GET,produces = "application/json",description ="分账信息" )
+	@ApiOperation(tags="order", methods= RequestMethod.GET,produces = "application/json",description ="分账信息" )
 	/*@ApiParams({
 			@ApiParam(name="userName",required=false,description="分账信息")
 	})*/
@@ -44,7 +44,14 @@ public class OrderController extends Controller {
 		renderJson(Ret.ok());
 	}
 
+	@ApiOperation(tags="order", methods= RequestMethod.GET,produces = "application/json",description ="打印" )
+	/*@ApiParams({
+			@ApiParam(name="userName",required=false,description="分账信息")
+	})*/
+	@ApiResponses({
+			@ApiResponse(code ="state",message = "状态 ok 为成功")
 
+	})
 	public void print() throws Exception {
 		String ip="219.237.112.11";
 		//String ip="222.129.19.230";//getIpAddress(getRequest());
@@ -56,6 +63,14 @@ public class OrderController extends Controller {
 		System.out.println(jsonResult);
 		renderJson(jsonResult);
 	}
+	@ApiOperation(tags="order", methods= RequestMethod.GET,produces = "application/json",description ="物流订阅" )
+	/*@ApiParams({
+			@ApiParam(name="userName",required=false,description="分账信息")
+	})*/
+	@ApiResponses({
+			@ApiResponse(code ="state",message = "状态 ok 为成功")
+
+	})
 	/*
 	  * 物流信息订阅
 	 */
@@ -66,13 +81,13 @@ public class OrderController extends Controller {
 		orderService.subscript(searchData);
 		renderJson(Ret.ok());
 	}
-	/**
+/*	*//**
 	 * 获取请求主机IP地址,如果通过代理进来，则透过防火墙获取真实IP地址;
 	 *
 	 * @param request
 	 * @return
 	 * @throws IOException
-	 */
+	 *//*
 	public final static String getIpAddress(HttpServletRequest request) throws IOException {
 		// 获取请求主机IP地址,如果通过代理进来，则透过防火墙获取真实IP地址
 
@@ -105,7 +120,15 @@ public class OrderController extends Controller {
 			}
 		}
 		return ip;
-	}
+	}*/
+	@ApiOperation(tags="order", methods= RequestMethod.GET,produces = "application/json",description ="首页" )
+	/*@ApiParams({
+			@ApiParam(name="userName",required=false,description="分账信息")
+	})*/
+	@ApiResponses({
+			@ApiResponse(code ="state",message = "状态 ok 为成功")
+
+	})
 	public void index() {
 		String name=getPara("userName");
 		renderJson(Ret.ok("msg","测试成功！").set("userName", name));
