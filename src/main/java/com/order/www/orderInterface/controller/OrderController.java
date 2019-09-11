@@ -27,12 +27,32 @@ import java.util.UUID;
 public class OrderController extends Controller {
 	@Inject
 	OrderService orderService;
-	@ApiOperation(tags="order", methods= RequestMethod.GET,produces = "application/json",description ="分账信息" )
-	/*@ApiParams({
-			@ApiParam(name="userName",required=false,description="分账信息")
-	})*/
+	@ApiOperation(tags="order", methods={RequestMethod.GET,RequestMethod.POST},produces = "application/json",description ="分账信息" )
+	 @ApiParams({
+			@ApiParam(required=true, description="{" +
+					" \"OrderID\": \"LD201908291028005125373\"," +
+					" \"Amount\": 10.00," +
+					" \"AmountType\": 1," +
+					" \"OrderDate\": \"2019-1-1 00:00:00\"," +
+					" \"ProductName\": \"佛初草三瓶装\"," +
+					" \"ProductNumber\": 1," +
+					" \"ItemCode\": \"899900\"," +
+					" \"CreateTime\": \"2019-1-1 00:00:00\"," +
+					" \"Item\": [{" +
+					"  \"UserType\": 1," +
+					"  \"TypeName\": \"平台\"," +
+					"  \"Amount\": 100.00," +
+					"  \"Proportion\": 0.01" +
+					" }, {" +
+					"  \"UserType\": 2," +
+					"  \"TypeName\": \"供应商\"," +
+					"  \"Amount\": 5000.00," +
+					"  \"Proportion\": 0.5" +
+					" }]" +
+					"}")
+	})
 	@ApiResponses({
-			@ApiResponse(code ="state",message = "状态 ok 为成功")
+			@ApiResponse(code ="state",message = "状态 ok 为成功 其他为 失败")
 
 	})
 	public void GetTransfer() throws Exception {
