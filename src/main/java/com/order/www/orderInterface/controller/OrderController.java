@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -29,7 +30,7 @@ public class OrderController extends Controller {
 	OrderService orderService;
 	@ApiOperation(tags="order", methods={RequestMethod.GET,RequestMethod.POST},produces = "application/json",description ="分账信息" )
 	 @ApiParams({
-			@ApiParam(required=true, description="{" +
+			@ApiParam(required=true, description="[{" +
 					" \"OrderID\": \"LD201908291028005125373\"," +
 					" \"Amount\": 10.00," +
 					" \"AmountType\": 1," +
@@ -49,19 +50,25 @@ public class OrderController extends Controller {
 					"  \"Amount\": 5000.00," +
 					"  \"Proportion\": 0.5" +
 					" }]" +
-					"}")
+					"}]")
 	})
 	@ApiResponses({
 			@ApiResponse(code ="state",message = "状态 ok 为成功 其他为 失败")
 
 	})
-	public void GetTransfer() throws Exception {
+	public void GetTransfer(){
 		String result=getRawData();
 		System.out.println(result);
-		TransferData orderReturn= JSON.parseObject(result, TransferData.class);
+		try {
+			List<TransferData> orderReturns=JSON.parseArray(result, TransferData.class);
+			//TransferData orderReturn= JSON.parseObject(result, TransferData.class);
 
-		orderService.GetTransfer(orderReturn);
-		renderJson(Ret.ok());
+			orderService.GetTransfer(orderReturns);
+			renderJson(Ret.ok());
+		}catch (Exception e){
+			renderJson(Ret.fail());
+		}
+
 	}
 
 	@ApiOperation(tags="order", methods= RequestMethod.GET,produces = "application/json",description ="打印" )
@@ -104,7 +111,6 @@ public class OrderController extends Controller {
 /*	*//**
 	 * 获取请求主机IP地址,如果通过代理进来，则透过防火墙获取真实IP地址;
 	 *
-	 * @param request
 	 * @return
 	 * @throws IOException
 	 *//*

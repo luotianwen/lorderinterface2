@@ -200,32 +200,38 @@ public class OrderService {
         }
     }
     @Before(Tx.class)
-    public void GetTransfer(TransferData transferData) {
-        List<TransferData.ItemBean> ibs=transferData.getItem();
-        TaskLine tl=TaskLine.dao.findFirst("select id from pool_task_line where task_no=? and product_no=?",transferData.getOrderID(),transferData.getItemCode());
+    public void GetTransfer(List<TransferData> orderReturns) {
 
-        for (TransferData.ItemBean ib:ibs
+
+        for (TransferData transferData:orderReturns
              ) {
-            //用户类型 0 门店，1 代理商，2 供应商，3 平台，5 魅力合伙人
-            if(3==ib.getUserType()){
-                tl.setProfitLsdinfoAmount(new BigDecimal(ib.getAmount()));
-                tl.setProfitLsdinfoRates(new BigDecimal(ib.getProportion()));
+        List<TransferData.ItemBean> ibs=transferData.getItem();
+            TaskLine tl=TaskLine.dao.findFirst("select id from pool_task_line where task_no=? and product_no=?",transferData.getOrderID(),transferData.getItemCode());
+            if(null==tl){
+                continue;
             }
-            else if(0==ib.getUserType()){
-                tl.setProfitStoreAmount(new BigDecimal(ib.getAmount()));
-                tl.setProfitStoreRates(new BigDecimal(ib.getProportion()));
+            for (TransferData.ItemBean ib:ibs
+                 ) {
+                //用户类型 0 门店，1 代理商，2 供应商，3 平台，5 魅力合伙人
+                if(3==ib.getUserType()){
+                    tl.setProfitLsdinfoAmount(new BigDecimal(ib.getAmount()));
+                    tl.setProfitLsdinfoRates(new BigDecimal(ib.getProportion()));
+                }
+                else if(0==ib.getUserType()){
+                    tl.setProfitStoreAmount(new BigDecimal(ib.getAmount()));
+                    tl.setProfitStoreRates(new BigDecimal(ib.getProportion()));
+                }
+                else if(1==ib.getUserType()){
+                    tl.setProfitLsdtechAmount(new BigDecimal(ib.getAmount()));
+                    tl.setProfitLsdtechRates(new BigDecimal(ib.getProportion()));
+                }
+                else if(2==ib.getUserType()){
+                    tl.setProfitSupplierAmount(new BigDecimal(ib.getAmount()));
+                    tl.setProfitSupplierRates(new BigDecimal(ib.getProportion()));
+                }
             }
-            else if(1==ib.getUserType()){
-                tl.setProfitLsdtechAmount(new BigDecimal(ib.getAmount()));
-                tl.setProfitLsdtechRates(new BigDecimal(ib.getProportion()));
-            }
-            else if(2==ib.getUserType()){
-                tl.setProfitSupplierAmount(new BigDecimal(ib.getAmount()));
-                tl.setProfitSupplierRates(new BigDecimal(ib.getProportion()));
-            }
+            tl.update();
         }
-        tl.update();
-
     }
 
     @Before(Tx.class)
