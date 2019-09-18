@@ -13,4 +13,5 @@ public class TaskLine extends BaseTaskLine<TaskLine> {
 	public List<TaskLine> getTls(String taskid){
 	    return this.find("select * from pool_task_line where  batch_num is null and pool_task_id=?",taskid);
     }
+
 }

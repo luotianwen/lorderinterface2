@@ -248,4 +248,34 @@ public class OrderService {
             Db.update("insert into pool_logistic values(?,?,?,?)",id,searchData.getLogisticCode(),JSON.toJSON(searchData),new Date());
         }
     }
+
+    /**
+     * 获取当天已发货的订单
+     */
+    public void orderDeliver() {
+        List<OrderTask> ots=OrderTask.dao.getCurDeliverOrder();
+        Map map = new HashMap();
+        List<Record> ess=Db.find("select name , remarks from pool_express");
+
+        for(OrderTask ot:ots){
+            map.clear();
+            String[] cs=ot.getCarriers().split("\\s+");
+            String LogisticsNum="";
+            for (Record es:ess){
+                if(es.getStr("name").contains(cs[0])){
+                    LogisticsNum=es.getStr("remarks");
+                    break;
+                }
+            }
+            if(StrKit.isBlank(LogisticsNum)) {
+                continue;
+            }
+            map.put("OrderID",ot.getTaskNo());
+            map.put("LogisticsNum",LogisticsNum);
+            map.put("LogisticsCode",cs[1]);
+            String json = OrderStatic.lxdpost(OrderStatic.SendGoods, map);
+            log.info("发送发货"+ot.getTaskNo()+"   "+json);
+
+        }
+    }
 }

@@ -1,10 +1,15 @@
-cron4j=task1,task2
-task1.cron=04 00 * * *
-task1.class=com.order.www.orderInterface.task.OrderCronTask
-task1.daemon=true
-task1.enable=true
+cron4j=getorder,batch,deliver
+getorder.cron=04 00 * * *
+getorder.class=com.order.www.orderInterface.task.OrderCronTask
+getorder.daemon=true
+getorder.enable=true
 
-task2.cron=04 01 * * *
-task2.class=com.order.www.orderInterface.task.OrderBatchTask
-task2.daemon=true
-task2.enable=true
+batch.cron=04 01 * * *
+batch.class=com.order.www.orderInterface.task.OrderBatchTask
+batch.daemon=true
+batch.enable=true
+
+deliver.cron=00 23 * * *
+deliver.class=com.order.www.orderInterface.task.OrderDeliverTask
+deliver.daemon=true
+deliver.enable=true

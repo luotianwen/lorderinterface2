@@ -1,21 +1,20 @@
 package com.order.www.orderInterface.task;
 
 import com.jfinal.aop.Aop;
-import com.jfinal.aop.Inject;
 import com.jfinal.log.Log;
 import com.order.www.orderInterface.service.OrderService;
 
 /**
- * 订单处理任务
- * 订单集成任务
- *@author martins
+ * 订单发货任务
  */
-public class OrderBatchTask implements Runnable {
-    Log log = Log.getLog(OrderBatchTask.class);
+public class OrderDeliverTask implements Runnable{
+    Log log = Log.getLog(OrderDeliverTask.class);
 
     static OrderService orderService = Aop.get(OrderService.class);
+
     @Override
     public void run() {
-        orderService.batch();
+        log.info("发货开始");
+        orderService.orderDeliver();
     }
 }
