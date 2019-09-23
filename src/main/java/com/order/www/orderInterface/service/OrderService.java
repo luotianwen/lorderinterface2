@@ -271,8 +271,8 @@ public class OrderService {
                 continue;
             }
             map.put("OrderID",ot.getTaskNo());
-            map.put("LogisticsNum",LogisticsNum);
-            map.put("LogisticsCode",cs[1]);
+            map.put("LogisticsNum",cs[1]);
+            map.put("LogisticsCode",LogisticsNum);
             String json = OrderStatic.lxdpost(OrderStatic.SendGoods, map);
             log.info("发送发货"+ot.getTaskNo()+"   "+json);
 
