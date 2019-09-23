@@ -8,7 +8,35 @@ import com.jfinal.plugin.activerecord.IBean;
  */
 @SuppressWarnings("serial")
 public abstract class BaseOrderTask<M extends BaseOrderTask<M>> extends Model<M> implements IBean {
+	/**
+	 * 订单集成ID，UUID
+	 */
+	public void setShipperID(java.lang.String shipperID) {
+		set("shipperID", shipperID);
+	}
 
+	/**
+	 * 订单集成ID，UUID
+	 */
+	public java.lang.String getShipperID() {
+		return getStr("shipperID");
+	}
+	/**
+	 * /**
+	 * 订单集成ID，UUID
+	 */
+	public void setShipperName(java.lang.String id) {
+		set("shipperName", id);
+	}
+
+	/**
+	 * 订单集成ID，UUID
+	 */
+	public java.lang.String getShipperName() {
+		return getStr("shipperName");
+	}
+	/**
+	 */
 	/**
 	 * 订单集成ID，UUID
 	 */

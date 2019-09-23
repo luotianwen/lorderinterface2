@@ -21,6 +21,9 @@ public class _MappingKit {
 		arp.addMapping("pool_task", "id", OrderTask.class);
 		arp.addMapping("pool_task_line", "id", TaskLine.class);
 		arp.addMapping("pool_json", "id", OrderJson.class);
+		arp.addMapping("pool_task_line_money", "id", TaskLineMoney.class);
+		arp.addMapping("pool_givemoney", "id", Givemoney.class);
+		arp.addMapping("pool_givemoney_order", "id", GivemoneyOrder.class);
 	}
 }
 

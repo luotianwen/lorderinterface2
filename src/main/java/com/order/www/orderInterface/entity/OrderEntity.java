@@ -8,19 +8,54 @@ import java.util.List;
 
 public class OrderEntity implements Serializable {
 
+
+
+    @JSONField(format="yyyy/mm/DD HH:mm:ss")
+    private Date docDueDate;
+
+
+    /**
+     * OrderID : LD201908291024071292071
+     * ReceiveName : 某某某
+     * Mobile : 13022225669
+     * CardCode : 800099
+     * DocDueDate : 2019/8/29 10:24:07
+     * OrderAddress : 某个街道的房间
+     * ProName : 北京
+     * CityName : 市辖区
+     * DisName : 朝阳区
+     * UserID : 77552
+     * Remark :
+     * OrderClass : 0
+     * UserName : 丑
+     * PayName : 账户余额
+     * ActivityType : 0
+     * ActivityTypeName :
+     * ActivityID : 0
+     * ActivityName :
+     * CreateUserID : 0
+     * CreateUserName :
+     * CouponID : 0
+     * CouponName :
+     * ShipperType : 1
+     * ShipperID : 1
+     * ShipperName : test1
+     * Items : [{"ItemCode":"899335","QuanTity":1,"Price":0,"ProductName":"净牌-雪莲滋养贴100片","Score":0,"SupplierID":0,"SupplierName":"众生平安"},{"ItemCode":"888890-01","QuanTity":1,"Price":0,"ProductName":"新版净牌-雪莲滋养贴200片","Score":800,"SupplierID":0,"SupplierName":"众生平安"}]
+     */
+
     private String orderID;
     private String receiveName;
     private String mobile;
     private String cardCode;
-    @JSONField(format="yyyy/mm/DD HH:mm:ss")
-    private Date docDueDate;
     private String orderAddress;
     private String proName;
     private String cityName;
     private String disName;
     private String userID;
     private String remark;
-    private String orderClass;
+    private int orderClass;
+    private String userName;
+    private String payName;
     private int activityType;
     private String activityTypeName;
     private int activityID;
@@ -29,13 +64,95 @@ public class OrderEntity implements Serializable {
     private String createUserName;
     private int couponID;
     private String couponName;
+    private int shipperType;
+    private int shipperID;
+    private String shipperName;
+    private List<ItemsBean> Items;
+    private int status;
 
-    public String getOrderClass() {
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public Date getDocDueDate() {
+        return docDueDate;
+    }
+
+
+    public String getOrderAddress() {
+        return orderAddress;
+    }
+
+    public void setOrderAddress(String orderAddress) {
+        this.orderAddress = orderAddress;
+    }
+
+    public String getProName() {
+        return proName;
+    }
+
+    public void setProName(String proName) {
+        this.proName = proName;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getDisName() {
+        return disName;
+    }
+
+    public void setDisName(String disName) {
+        this.disName = disName;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public int getOrderClass() {
         return orderClass;
     }
 
-    public void setOrderClass(String orderClass) {
+    public void setOrderClass(int orderClass) {
         this.orderClass = orderClass;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPayName() {
+        return payName;
+    }
+
+    public void setPayName(String payName) {
+        this.payName = payName;
     }
 
     public int getActivityType() {
@@ -102,7 +219,41 @@ public class OrderEntity implements Serializable {
         this.couponName = couponName;
     }
 
-    private java.util.List<ItemsBean> items;
+    public int getShipperType() {
+        return shipperType;
+    }
+
+    public void setShipperType(int shipperType) {
+        this.shipperType = shipperType;
+    }
+
+    public int getShipperID() {
+        return shipperID;
+    }
+
+    public void setShipperID(int shipperID) {
+        this.shipperID = shipperID;
+    }
+
+    public String getShipperName() {
+        return shipperName;
+    }
+
+    public void setShipperName(String shipperName) {
+        this.shipperName = shipperName;
+    }
+
+    public List<ItemsBean> getItems() {
+        return Items;
+    }
+
+    public void setItems(List<ItemsBean> items) {
+        Items = items;
+    }
+
+    public void setDocDueDate(Date docDueDate) {
+        this.docDueDate = docDueDate;
+    }
 
     public String getOrderID() {
         return orderID;
@@ -136,97 +287,32 @@ public class OrderEntity implements Serializable {
         this.cardCode = cardCode;
     }
 
-    public Date getDocDueDate() {
-        return docDueDate;
-    }
-
-    public void setDocDueDate(Date docDueDate) {
-        this.docDueDate = docDueDate;
-    }
-
-    public String getOrderAddress() {
-        return orderAddress;
-    }
-
-    public void setOrderAddress(String orderAddress) {
-        this.orderAddress = orderAddress;
-    }
-
-    public String getProName() {
-        return proName;
-    }
-
-    public void setProName(String proName) {
-        this.proName = proName;
-    }
-
-    public String getCityName() {
-        return cityName;
-    }
-
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
-    }
-
-    public String getDisName() {
-        return disName;
-    }
-
-    public void setDisName(String disName) {
-        this.disName = disName;
-    }
-
-    public String getUserID() {
-        return userID;
-    }
-
-    public void setUserID(String userID) {
-        this.userID = userID;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public List<ItemsBean> getItems() {
-        return items;
-    }
-
-    public void setItems(List<ItemsBean> items) {
-        this.items = items;
-    }
-
     public static class ItemsBean {
         /**
-         * ItemCode : 88888888
+         * ItemCode : 899335
          * QuanTity : 1
-         * Price : 10.0
+         * Price : 0
+         * ProductName : 净牌-雪莲滋养贴100片
+         * Score : 0
+         * SupplierID : 0
+         * SupplierName : 众生平安
          */
 
         private String itemCode;
         private int quanTity;
-        private double price;
+        private int price;
         private String productName;
-        private double  score;
+        private int score;
+        private int supplierID;
+        private String supplierName;
+        private int productType;
 
-        public String getProductName() {
-            return productName;
+        public int getProductType() {
+            return productType;
         }
 
-        public void setProductName(String productName) {
-            this.productName = productName;
-        }
-
-        public double getScore() {
-            return score;
-        }
-
-        public void setScore(double score) {
-            this.score = score;
+        public void setProductType(int productType) {
+            this.productType = productType;
         }
 
         public String getItemCode() {
@@ -245,13 +331,44 @@ public class OrderEntity implements Serializable {
             this.quanTity = quanTity;
         }
 
-        public double getPrice() {
+        public int getPrice() {
             return price;
         }
 
-        public void setPrice(double price) {
+        public void setPrice(int price) {
             this.price = price;
         }
 
+        public String getProductName() {
+            return productName;
+        }
+
+        public void setProductName(String productName) {
+            this.productName = productName;
+        }
+
+        public int getScore() {
+            return score;
+        }
+
+        public void setScore(int score) {
+            this.score = score;
+        }
+
+        public int getSupplierID() {
+            return supplierID;
+        }
+
+        public void setSupplierID(int supplierID) {
+            this.supplierID = supplierID;
+        }
+
+        public String getSupplierName() {
+            return supplierName;
+        }
+
+        public void setSupplierName(String supplierName) {
+            this.supplierName = supplierName;
+        }
     }
 }

@@ -29,14 +29,14 @@ public class _JFinalDemoGenerator {
 	
 	public static void main(String[] args) {
 		// base model 所使用的包名
-		String baseModelPackageName = "com.order.www.orderInterface.entity";
+		String baseModelPackageName = "com.order.www.orderInterface.entity1";
 		// base model 文件保存路径
-		String baseModelOutputDir = PathKit.getWebRootPath() + "/src/main/java/com/order/www/orderInterface/entity";
+		String baseModelOutputDir = PathKit.getWebRootPath() + "/src/main/java/com/order/www/orderInterface/entity1";
 		
 		// model 所使用的包名 (MappingKit 默认使用的包名)
-		String modelPackageName = "com.order.www.orderInterface.entity";
+		String modelPackageName = "com.order.www.orderInterface.entity1";
 		// model 文件保存路径 (MappingKit 与 DataDictionary 文件默认保存路径)
-		String modelOutputDir = baseModelOutputDir + "/..";
+		String modelOutputDir = baseModelOutputDir + "/../1";
 		
 		// 创建生成器
 		Generator generator = new Generator(getDataSource(), baseModelPackageName, baseModelOutputDir, modelPackageName, modelOutputDir);

@@ -8,6 +8,7 @@ import com.jfinal.log.Log;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import com.jfinal.plugin.activerecord.tx.TxConfig;
 import com.order.www.orderInterface.common.OrderStatic;
 import com.order.www.orderInterface.entity.*;
 import com.order.www.orderInterface.task.OrderBatchTask;
@@ -33,9 +34,9 @@ public class OrderService {
                 ) {
             List<TaskLine> tls = TaskLine.dao.getTls(r.getStr("id"));
             //订单行数据超过一个物料的不做订单集成
-           /* if (tls.size() > 1 || tls.size() == 0) {
+            if (tls.size() > 1 || tls.size() == 0) {
                 continue;
-            }*/
+            }
             BigDecimal db = BigDecimal.ZERO;
             Date currentTime = new Date();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
@@ -93,7 +94,7 @@ public class OrderService {
      */
     public void orderCron() {
         Map map = new HashMap();
-        map.put("Number", "100");
+        map.put("Number", "10");
         //String json="{\"Status\":200,\"Result\":{\"Total\":7,\"Surplus\":0,\"List\":[{\"OrderID\":\"LD201907091443107423814\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/9 14:43:17\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"899335\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907101046030277325\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/10 10:46:04\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"899850\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907101047021791306\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/10 10:47:04\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"899335\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907101050389833337\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/10 10:50:39\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"899521\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907241744437446397\",\"ReceiveName\":\"vbb\",\"Mobile\":\"16689876567\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/24 17:44:43\",\"OrderAddress\":\"宝宝不会后悔\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"西城区\",\"UserID\":\"74301\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"899334\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907251740289939288\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/25 17:40:30\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"889041\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]},{\"OrderID\":\"LD201907251741405318426\",\"ReceiveName\":\"王祥\",\"Mobile\":\"15227904344\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019/7/25 17:41:42\",\"OrderAddress\":\"天通苑北街道东沙各庄\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"昌平区\",\"UserID\":\"96097\",\"Remark\":\"\",\"Items\":[{\"ItemCode\":\"889041\",\"QuanTity\":1,\"Price\":0.0,\"CurrentScore\":0.0}]}]},\"Msg\":\"成功\"}";
         String json = OrderStatic.lxdpost(OrderStatic.SendOrder, map);
         OrderJson oj=new OrderJson();
@@ -152,6 +153,9 @@ public class OrderService {
                     tk.setName(it.getProductName());
                     tk.setLxbAmount(new BigDecimal(it.getScore()));
                     tk.setRelievePrice(new BigDecimal(it.getPrice()));
+                    tk.setSupplierID(it.getSupplierID());
+                    tk.setSupplierName(it.getSupplierName());
+                    tk.setProductClass(it.getProductType()+"");
                     tks.add(tk);
                     db = db.add(new BigDecimal(it.getPrice()));
                 }
@@ -170,12 +174,15 @@ public class OrderService {
                 ot.setAddressCounty(oe.getDisName());
                 ot.setFax(oe.getUserID());
                 ot.setPoolTaskNo(no);
-                ot.setTaskType(oe.getOrderClass());
+                ot.setTaskType(oe.getOrderClass()+"");
                 ot.setDmNo(oe.getActivityID()+"");
                 ot.setDmName(oe.getActivityName());
                 ot.setTaskCreator(oe.getCreateUserName());
                 ot.setRemark(oe.getRemark());
                 ot.setCreateDate(new Date());
+                ot.setSaleGroup(oe.getShipperType()+"");
+                ot.setShipperName(oe.getShipperName());
+                ot.setShipperID(oe.getShipperID()+"");
                 for (TaskLine t : tks
                         ) {
                     t.setPoolTaskNo(no);
@@ -204,33 +211,25 @@ public class OrderService {
 
 
         for (TransferData transferData:orderReturns
-             ) {
-        List<TransferData.ItemBean> ibs=transferData.getItem();
+                ) {
+            List<TransferData.ItemBean> ibs=transferData.getItem();
             TaskLine tl=TaskLine.dao.findFirst("select id from pool_task_line where task_no=? and product_no=?",transferData.getOrderID(),transferData.getItemCode());
             if(null==tl){
                 continue;
             }
             for (TransferData.ItemBean ib:ibs
-                 ) {
-                //用户类型 0 门店，1 代理商，2 供应商，3 平台，5 魅力合伙人
-                if(3==ib.getUserType()){
-                    tl.setProfitLsdinfoAmount(new BigDecimal(ib.getAmount()));
-                    tl.setProfitLsdinfoRates(new BigDecimal(ib.getProportion()));
-                }
-                else if(0==ib.getUserType()){
-                    tl.setProfitStoreAmount(new BigDecimal(ib.getAmount()));
-                    tl.setProfitStoreRates(new BigDecimal(ib.getProportion()));
-                }
-                else if(1==ib.getUserType()){
-                    tl.setProfitLsdtechAmount(new BigDecimal(ib.getAmount()));
-                    tl.setProfitLsdtechRates(new BigDecimal(ib.getProportion()));
-                }
-                else if(2==ib.getUserType()){
-                    tl.setProfitSupplierAmount(new BigDecimal(ib.getAmount()));
-                    tl.setProfitSupplierRates(new BigDecimal(ib.getProportion()));
-                }
+                    ) {
+                String id = UUID.randomUUID().toString().replaceAll("-", "");
+                TaskLineMoney tm=new TaskLineMoney();
+                tm.setId(id);
+                tm.setLineId(tl.getId());
+                tm.setAmount(ib.getAmount());
+                tm.setProportion(ib.getProportion());
+                tm.setTypeName(ib.getTypeName());
+                tm.setUserType(ib.getUserType());
+                tm.save();
+
             }
-            tl.update();
         }
     }
 
@@ -271,11 +270,152 @@ public class OrderService {
                 continue;
             }
             map.put("OrderID",ot.getTaskNo());
-            map.put("LogisticsNum",cs[1]);
-            map.put("LogisticsCode",LogisticsNum);
+            map.put("LogisticsNum",LogisticsNum);
+            map.put("LogisticsCode",cs[1]);
             String json = OrderStatic.lxdpost(OrderStatic.SendGoods, map);
             log.info("发送发货"+ot.getTaskNo()+"   "+json);
 
         }
+    }
+
+    public void SendOrder(OrderEntity oe) {
+        BigDecimal db = BigDecimal.ZERO;
+        Date currentTime = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+        String dateString = "DD" + formatter.format(currentTime);
+        Record r = Db.findFirst("select pool_task_no as no from pool_task where pool_task_no like '" + dateString + "%' order by create_date desc");
+        String no1 = "";
+        if (r != null) {
+            no1 = r.getStr("no");
+        }
+        int newNum = 0;
+        String newStrNum = "";
+        if (StrKit.isBlank(no1)) {
+            newStrNum = String.format("%05d", newNum);
+        } else {
+            newNum = Integer.parseInt(no1.substring(10, no1.length()));
+        }
+
+
+
+        newNum++;
+        //数字长度为5位，长度不够数字前面补0
+        newStrNum = String.format("%05d", newNum);
+        no1 = dateString + newStrNum;
+
+        String no = no1;
+        String oid = UUID.randomUUID().toString().replaceAll("-", "");
+        List<OrderEntity.ItemsBean> obs = oe.getItems();
+        List<TaskLine> tks = new ArrayList<>();
+        for (OrderEntity.ItemsBean it : obs
+                ) {
+            String id = UUID.randomUUID().toString().replaceAll("-", "");
+            TaskLine tk = new TaskLine();
+            tk.setPoolTaskId(oid);
+            tk.setId(id);
+            tk.setTaskNo(oe.getOrderID());
+            tk.setProductNo(it.getItemCode());
+            tk.setAmount(it.getQuanTity());
+            tk.setName(it.getProductName());
+            tk.setLxbAmount(new BigDecimal(it.getScore()));
+            tk.setRelievePrice(new BigDecimal(it.getPrice()));
+            tk.setSupplierID(it.getSupplierID());
+            tk.setSupplierName(it.getSupplierName());
+            tk.setProductClass(it.getProductType()+"");
+            tks.add(tk);
+            db = db.add(new BigDecimal(it.getPrice()));
+        }
+
+        OrderTask ot = new OrderTask();
+        ot.setTaskAmount(db);
+        ot.setId(oid);
+        ot.setTaskStatus(1);
+        ot.setTaskNo(oe.getOrderID());
+        ot.setTaskGenDatetime(oe.getDocDueDate());
+        ot.setConsigneeName(oe.getReceiveName());
+        ot.setConsigneePhone(oe.getMobile());
+        ot.setAddressDetail(oe.getOrderAddress());
+        ot.setAddressProvince(oe.getProName());
+        ot.setAddressCity(oe.getCityName());
+        ot.setAddressCounty(oe.getDisName());
+        ot.setFax(oe.getUserID());
+        ot.setPoolTaskNo(no);
+        ot.setTaskType(oe.getOrderClass()+"");
+        ot.setDmNo(oe.getActivityID()+"");
+        ot.setDmName(oe.getActivityName());
+        ot.setTaskCreator(oe.getCreateUserName());
+        ot.setRemark(oe.getRemark());
+        ot.setCreateDate(new Date());
+        ot.setShipperName(oe.getShipperName());
+        ot.setShipperID(oe.getShipperID()+"");
+        for (TaskLine t : tks
+                ) {
+            t.setPoolTaskNo(no);
+        }
+
+        try {
+            Db.tx(() -> {
+                ot.save();
+                for (TaskLine t : tks
+                        ) {
+                    t.save();
+                }
+                return true;
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+        }
+
+    }
+    @Before(Tx.class)
+    public void getMoney(GetMoney money) {
+        String oid = UUID.randomUUID().toString().replaceAll("-", "");
+        Givemoney gv=new Givemoney();
+        gv.setId(oid);
+        gv.setAccountName(money.getAccountName());
+        gv.setAccountNumber(money.getAccountNumber());
+        gv.setAmount(new BigDecimal(money.getAmount()));
+        gv.setBankName(money.getBankName());
+        gv.setUserID(money.getUserID());
+        gv.setUserType(money.getUserType());
+        gv.setTypeName(money.getTypeName());
+
+        List<GivemoneyOrder> gos = new ArrayList<>();
+
+        for (GetMoney.OrderListBean ob:money.getOrderList()
+                ) {
+            GivemoneyOrder go=new GivemoneyOrder();
+            go.setAmount(new BigDecimal(ob.getAmount()));
+            go.setMoneyId(oid);
+            go.setId( UUID.randomUUID().toString().replaceAll("-", ""));
+            go.setItemCode(ob.getItemCode());
+            go.setOrderDate(ob.getOrderDate());
+            go.setProductName(ob.getProductName());
+            go.setProductNumber(ob.getProductNumber());
+            gos.add(go);
+
+        }
+        try {
+            Db.tx(() -> {
+                gv.save();
+                for (GivemoneyOrder t : gos
+                        ) {
+                    t.save();
+                }
+                return true;
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+        }
+
+        System.out.println(money);
+    }
+    @Before(Tx.class)
+    public void changeOrderStatus(OrderEntity money) {
+        Db.update("update pool_task set task_status=? where task_no=?",money.getStatus(),money.getOrderID());
     }
 }

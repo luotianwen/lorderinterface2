@@ -13,3 +13,6 @@ lxd.Key=FBF98310-3607-4D99-80D1-406A1D3CC745
 #众生平安科技（供应商）
 zs.From=Supplier@0
 zs.Key=FBF98310-3607-4D99-80D1-406A1D3CC746
+
+sap.url=http://172.17.250.191:9091
+lxd.url=http://interface.lxisland.cn
