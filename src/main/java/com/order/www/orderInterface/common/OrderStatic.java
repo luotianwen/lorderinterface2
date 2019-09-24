@@ -53,37 +53,28 @@ public class OrderStatic {
     /**
      * 发送 post请求访问本地应用并根据传递参数不同返回不同结果
      */
-    public static String lxdpost(String url,Map<String, String> params) {
-
-        Map<String, String> headers=new HashMap<>();
-        headers.put("From", PropKit.get("lxd.From"));
-        //随机数+空格+MD5（MD5（KEY）+随机数）
-        int r=new Random().nextInt();
-        String keys=PropKit.get("lxd.Key");
-        String key=r+" "+ md5(md5(keys).toUpperCase()+r).toUpperCase();
-        headers.put("Authorization",key);
-        System.out.println(headers.toString());
-        return post(url,params,headers);
-    }
-
-    public static String post(String url,String param){
+    public static String post(String url, String params) {
         String str="";
         // 创建默认的httpClient实例.
         CloseableHttpClient httpclient = HttpClients.createDefault();
         // 创建httppost，
         HttpPost httppost = new HttpPost(url);
         httppost.addHeader("Content-Type", "application/json");
+
+        // 创建参数队列
         try {
-            httppost.setEntity(new StringEntity(param));
+            httppost.setEntity(new StringEntity(params, "UTF-8"));
             CloseableHttpResponse response = httpclient.execute(httppost);
             try {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     str= EntityUtils.toString(entity, "UTF-8");
+
                 }
             } finally {
                 response.close();
             }
+
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e1) {
@@ -100,6 +91,22 @@ public class OrderStatic {
         }
         return str;
     }
+    /**
+     * 发送 post请求访问本地应用并根据传递参数不同返回不同结果
+     */
+    public static String lxdpost(String url,Map<String, String> params) {
+
+        Map<String, String> headers=new HashMap<>();
+        headers.put("From", PropKit.get("lxd.From"));
+        //随机数+空格+MD5（MD5（KEY）+随机数）
+        int r=new Random().nextInt();
+        String keys=PropKit.get("lxd.Key");
+        String key=r+" "+ md5(md5(keys).toUpperCase()+r).toUpperCase();
+        headers.put("Authorization",key);
+        System.out.println(headers.toString());
+        return post(url,params,headers);
+    }
+
     /**
      * 发送 post请求访问本地应用并根据传递参数不同返回不同结果
      */

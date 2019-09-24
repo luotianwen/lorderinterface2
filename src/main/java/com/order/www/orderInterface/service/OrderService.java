@@ -3,15 +3,14 @@ package com.order.www.orderInterface.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
-import com.jfinal.plugin.activerecord.tx.TxConfig;
 import com.order.www.orderInterface.common.OrderStatic;
 import com.order.www.orderInterface.entity.*;
-import com.order.www.orderInterface.task.OrderBatchTask;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -26,9 +25,11 @@ public class OrderService {
     /**
      * 生成订单接口服务
      * 订单集成 只做一个订单行数据的
+     * 门店通过人客合一系统下单到商城平台并完成给平台的支付后，莲香岛科技将商品配送给门店，确认门店签收或发货一周后，平台公司将货款支付给莲香岛科技。莲香岛科技通过外挂实现订单分拣、发货、称重、打印面单等操作。
+     订单集合不合单，此类业务给出标识，按此标识识别订单类型
      */
     public void batch() {
-        List<Record> ots = Db.find("select id from pool_task where erp_no is null and date(task_gen_datetime)= DATE_SUB(CURDATE(),INTERVAL 1 DAY) ");
+        List<Record> ots = Db.find("select id from pool_task where task_type='1' and  erp_no is null and date(task_gen_datetime)= DATE_SUB(CURDATE(),INTERVAL 1 DAY) ");
         //读取前一天的订单数据
         for (Record r : ots
                 ) {
@@ -417,5 +418,43 @@ public class OrderService {
     @Before(Tx.class)
     public void changeOrderStatus(OrderEntity money) {
         Db.update("update pool_task set task_status=? where task_no=?",money.getStatus(),money.getOrderID());
+    }
+
+    public void sapProfit() {
+        List<Record> tasklist=Db.find(
+                "select DISTINCT pt.id ,pt.task_no" +
+                        "from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm" +
+                        "where     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null");
+        for (Record task:tasklist
+             ) {
+            List<Record> list=Db.find(
+                    "select pt.task_no as platNo,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName," +
+                    "ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id " +
+                            "from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm" +
+                       "where     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null and pt.id=?",task.getStr("id"));
+           String json= OrderStatic.post(OrderStatic.journal,JsonKit.toJson(list));
+            ResponseEntity responseEntity=JSON.parseObject(json,ResponseEntity.class);
+            if(responseEntity.getCode()==0) {
+                try {
+                    Db.tx(() -> {
+                        for (Record r : list
+                                ) {
+                            Db.update("update pool_task_line_money set isok='0' where id=?", r.getStr("id"));
+                        }
+
+                        return true;
+                    });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.error(e.getMessage());
+                }
+
+            }else{
+                log.error("同步sap凭单失败"+task.getStr("task_no"));
+            }
+
+        }
+
     }
 }

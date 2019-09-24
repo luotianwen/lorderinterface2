@@ -5,19 +5,12 @@ import com.alibaba.fastjson.JSON;
 import com.jfinal.aop.Inject;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.Ret;
-import com.order.www.orderInterface.KdGoldAPIDemo;
-import com.order.www.orderInterface.Test;
 import com.order.www.orderInterface.entity.*;
 import com.order.www.orderInterface.service.OrderService;
 import top.hequehua.swagger.annotation.*;
 import top.hequehua.swagger.config.RequestMethod;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 /**
 

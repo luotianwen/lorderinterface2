@@ -5,7 +5,7 @@ getorder.daemon=true
 getorder.enable=true
 
 batch.cron=04 01 * * *
-batch.class=com.order.www.orderInterface.task.OrderBatchTask
+batch.class=com.order.www.orderInterface.task.OrderB2BBatchTask
 batch.daemon=true
 batch.enable=true
 
