@@ -28,16 +28,12 @@ public class OrderService {
      * 门店通过人客合一系统下单到商城平台并完成给平台的支付后，莲香岛科技将商品配送给门店，确认门店签收或发货一周后，平台公司将货款支付给莲香岛科技。莲香岛科技通过外挂实现订单分拣、发货、称重、打印面单等操作。
      订单集合不合单，此类业务给出标识，按此标识识别订单类型
      */
-    public void batch() {
-        List<Record> ots = Db.find("select id from pool_task where task_type='1' and  erp_no is null and date(task_gen_datetime)= DATE_SUB(CURDATE(),INTERVAL 1 DAY) ");
+    public void b2bbatch() {
+        List<Record> ots = Db.find("select id from pool_task where task_type='0' and  erp_no is null and date(task_gen_datetime)= DATE_SUB(CURDATE(),INTERVAL 1 DAY) ");
         //读取前一天的订单数据
         for (Record r : ots
                 ) {
             List<TaskLine> tls = TaskLine.dao.getTls(r.getStr("id"));
-            //订单行数据超过一个物料的不做订单集成
-            if (tls.size() > 1 || tls.size() == 0) {
-                continue;
-            }
             BigDecimal db = BigDecimal.ZERO;
             Date currentTime = new Date();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
@@ -90,6 +86,138 @@ public class OrderService {
         }
     }
 
+    /**
+     * 客户通过商城平台下单主商品并完成给平台的支付后，平台客服可指派某门店发货（场景A），如果门店拒绝接单或不具备发货条件，则客服可重新指派其它门店发货（场景B）。无论场景A还是场景B，都需要发货方确认货物已发出后，系统确认分润主体及金额。确认终端客户收到货后或货物发出一周后，平台公司通过系统向发货方分润99%，平台保留1%服务费。
+     * 客户通过账号余额、微信等第三方支付平台完成支付，第三方支付通过T+1的时间周期，打款给平台，平台确认发货后完成分润，但不打款，待客户收到货后执行分润金额打款。
+     */
+    public void b2cMainbatch() {
+        List<Record> ots = Db.find("select ptl.product_no as no ,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
+                "where pool_task_id=pt.id and  pt.task_type='0' and ptl.product_Class='1' and  pt.erp_no is null and date(pt.task_gen_datetime)= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
+                "GROUP BY    ptl.product_no ");
+        //读取前一天的订单数据
+        for (Record r : ots
+        ) {
+
+            BigDecimal db = BigDecimal.ZERO;
+            Date currentTime = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+            String dateString = "JC" + formatter.format(currentTime);
+            Record rn = Db.findFirst("select BATCH_NUM as no from pool_batch where BATCH_NUM like '" + dateString + "%' order by BATCH_GEN_DATETIME desc");
+            String no1 = "";
+            if (rn != null) {
+                no1 = rn.getStr("no");
+            }
+            int newNum = 0;
+            String newStrNum = "";
+            if (StrKit.notBlank(no1)) {
+                newNum = Integer.parseInt(no1.substring(10, no1.length()));
+            }
+
+            newNum++;
+            //数字长度为5位，长度不够数字前面补0
+            newStrNum = String.format("%05d", newNum);
+            no1 = dateString + newStrNum;
+            String no = no1;
+            String bid = UUID.randomUUID().toString().replaceAll("-", "");
+            Batch batch = new Batch();
+            batch.setId(bid);
+            batch.setBatchNum(no);
+
+            //batch.setBatchCreator();
+            batch.setBatchGenDatetime(new Date());
+             List<TaskLine> tls = TaskLine.dao.getB2cTls(r.getStr("id"),"1");
+            for (TaskLine tl : tls
+            ) {
+                db=db.add(tl.getRelievePrice());
+                String oid = UUID.randomUUID().toString().replaceAll("-", "");
+                BatchLine bl = new BatchLine();
+                bl.setId(oid);
+                bl.setPoolBatchId(bid);
+                bl.setProductId(tl.getProductNo());
+                bl.setSumPrice(tl.getRelievePrice());
+                bl.setAMOUNT(tl.getAmount());
+                bl.setNAME(tl.getName());
+                Db.tx(() -> {
+                    bl.save();
+                    Db.update("update pool_task_line set batch_num =? where id=?", no, tl.getId());
+                    return true;
+                });
+             }
+            batch.setSumAmt(db);
+            Db.tx(() -> {
+                batch.save();
+                return true;
+            });
+        }
+    }
+
+    /**
+     * 莲香岛科技通过买入卖出的方式销售礼品。客户通过商城平台下单礼品并完成给平台的支付后，莲香岛科技将礼品配送给客户，确认客户签收或发货一周后，平台公司将货款支付给莲香岛科技，扣除1%服务费。莲香岛科技通过外挂实现订单分拣、发货、称重、打印面单等操作。
+     * 订单集合后，判断SAP物料库存是否满足，对满足的物料，按商品销售价格相同的订单，生成一笔订单记录，通过接口写入SAP，SAP生成交货单，并返回订单集合系统交货单号。交货单输入参数：总价1=商品销售单价1×商品数量1；总价2=商品销售单价2×商品数量2；。。。。。。缺货的订单不发货，系统记录后随时可查询，下一批次订单处理时优先处理之前的缺货订单，以缺货时间长短确定发货优先级。
+     */
+    public void b2cGiftbatch() {
+
+        List<Record> ots = Db.find("select ptl.product_no as no  ,sum(ptl.amount) amount  from pool_task pt,pool_task_line ptl " +
+                "where pool_task_id=pt.id and  pt.task_type='0' and ptl.product_Class='2' and  pt.erp_no is null and date(pt.task_gen_datetime)= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
+                "GROUP BY    ptl.product_no ");
+        //List<Record> ots = Db.find("select id from pool_task where task_type='0' and  erp_no is null and date(task_gen_datetime)= DATE_SUB(CURDATE(),INTERVAL 1 DAY) ");
+        //读取前一天的订单数据
+        for (Record r : ots
+        ) {
+
+            BigDecimal db = BigDecimal.ZERO;
+            Date currentTime = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+            String dateString = "JC" + formatter.format(currentTime);
+            Record rn = Db.findFirst("select BATCH_NUM as no from pool_batch where BATCH_NUM like '" + dateString + "%' order by BATCH_GEN_DATETIME desc");
+            String no1 = "";
+            if (rn != null) {
+                no1 = rn.getStr("no");
+            }
+            int newNum = 0;
+            String newStrNum = "";
+            if (StrKit.notBlank(no1)) {
+                newNum = Integer.parseInt(no1.substring(10, no1.length()));
+            }
+
+            newNum++;
+            //数字长度为5位，长度不够数字前面补0
+            newStrNum = String.format("%05d", newNum);
+            no1 = dateString + newStrNum;
+            String no = no1;
+            String bid = UUID.randomUUID().toString().replaceAll("-", "");
+            Batch batch = new Batch();
+            batch.setId(bid);
+            batch.setBatchNum(no);
+            //batch.setBatchCreator();
+            batch.setBatchGenDatetime(new Date());
+
+
+            List<TaskLine> tls = TaskLine.dao.getB2cTls(r.getStr("id"),"2");
+            for (TaskLine tl : tls
+            ) {
+                db=db.add(tl.getRelievePrice());
+                String oid = UUID.randomUUID().toString().replaceAll("-", "");
+                BatchLine bl = new BatchLine();
+                bl.setId(oid);
+                bl.setPoolBatchId(bid);
+                bl.setProductId(tl.getProductNo());
+                bl.setSumPrice(tl.getRelievePrice());
+                bl.setAMOUNT(tl.getAmount());
+                bl.setNAME(tl.getName());
+                Db.tx(() -> {
+                    bl.save();
+                    Db.update("update pool_task_line set batch_num =? where id=?", no, tl.getId());
+                    return true;
+                });
+            }
+            batch.setSumAmt(db);
+            Db.tx(() -> {
+                batch.save();
+                return true;
+            });
+        }
+    }
     /**
      * 同步订单
      */

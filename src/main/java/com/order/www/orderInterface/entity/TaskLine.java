@@ -14,4 +14,7 @@ public class TaskLine extends BaseTaskLine<TaskLine> {
 	    return this.find("select * from pool_task_line where  batch_num is null and pool_task_id=?",taskid);
     }
 
+    public List<TaskLine> getB2cTls(String id, String s) {
+        return this.find("select * from pool_task_line where  batch_num is null and pool_task_id=? and product_Class=?",id,s);
+    }
 }
