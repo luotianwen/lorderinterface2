@@ -72,6 +72,9 @@ public class OrderService {
                 bl.setSumPrice(tl.getRelievePrice());
                 bl.setAMOUNT(tl.getAmount());
                 bl.setNAME(tl.getName());
+               // bl.set
+                //保存仓库
+                //Db.update("update pool_task_line set war =? where id=?", no, tl.getId());
                 Db.tx(() -> {
                     bl.save();
                     Db.update("update pool_task_line set batch_num =? where id=?", no, tl.getId());
@@ -94,6 +97,8 @@ public class OrderService {
         List<Record> ots = Db.find("select ptl.product_no as no ,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
                 "where pool_task_id=pt.id and  pt.task_type='0' and ptl.product_Class='1' and  pt.erp_no is null and date(pt.task_gen_datetime)= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
                 "GROUP BY    ptl.product_no ");
+
+
         //读取前一天的订单数据
         for (Record r : ots
         ) {
