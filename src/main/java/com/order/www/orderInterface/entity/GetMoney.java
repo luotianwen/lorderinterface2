@@ -25,6 +25,25 @@ public class GetMoney {
     private int userType;
     private int userID;
     private String typeName;
+    private int transferType;
+    private String yeepayID;
+
+    public int getTransferType() {
+        return transferType;
+    }
+
+    public void setTransferType(int transferType) {
+        this.transferType = transferType;
+    }
+
+    public String getYeepayID() {
+        return yeepayID;
+    }
+
+    public void setYeepayID(String yeepayID) {
+        this.yeepayID = yeepayID;
+    }
+
     private List<OrderListBean> orderList;
 
     public String getAccountNumber() {

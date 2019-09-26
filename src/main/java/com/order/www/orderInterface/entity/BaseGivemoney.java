@@ -192,5 +192,31 @@ public abstract class BaseGivemoney<M extends BaseGivemoney<M>> extends Model<M>
 	public String getTypeName() {
 		return getStr("typeName");
 	}
+	/**
+	 * 分账用户ID
+	 */
+	public void setTransferType(Integer userID) {
+		set("transferType", userID);
+	}
 
+	/**
+	 * 分账用户ID
+	 */
+	public Integer getTransferType() {
+		return getInt("transferType");
+	}
+
+	/**
+	 * 分账用户类型名称
+	 */
+	public void setYeepayID(String typeName) {
+		set("yeepayID", typeName);
+	}
+
+	/**
+	 * 分账用户类型名称
+	 */
+	public String getYeepayID() {
+		return getStr("yeepayID");
+	}
 }

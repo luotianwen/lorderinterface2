@@ -513,7 +513,8 @@ public class OrderService {
         gv.setUserID(money.getUserID());
         gv.setUserType(money.getUserType());
         gv.setTypeName(money.getTypeName());
-
+        gv.setTransferType(money.getTransferType());
+        gv.setYeepayID(money.getYeepayID());
         List<GivemoneyOrder> gos = new ArrayList<>();
 
         for (GetMoney.OrderListBean ob : money.getOrderList()
@@ -544,7 +545,7 @@ public class OrderService {
             log.error(e.getMessage());
         }
 
-        System.out.println(money);
+
     }
 
     @Before(Tx.class)
@@ -564,8 +565,11 @@ public class OrderService {
                             "ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id " +
                             "from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm" +
                             "where     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null and pt.id=?", task.getStr("id"));
-            String json = OrderStatic.post(OrderStatic.journal, JsonKit.toJson(list));
+            String param=JsonKit.toJson(list);
+            String json = OrderStatic.post(OrderStatic.journal,param);
+            log.info("凭单接口参数"+param);
             ResponseEntity responseEntity = JSON.parseObject(json, ResponseEntity.class);
+            log.info("凭单接口结果"+JsonKit.toJson(responseEntity));
             if (responseEntity.getCode() == 0) {
                 try {
                     Db.tx(() -> {
@@ -583,6 +587,7 @@ public class OrderService {
                 }
 
             } else {
+                log.error("同步sap凭单接口参数"+param);
                 log.error("同步sap凭单失败" + task.getStr("task_no"));
             }
 
@@ -618,9 +623,12 @@ public class OrderService {
             r.set("salesOrderLines",salesOrderLines);
             list.add(r);
         }
-
-        String json = OrderStatic.post(OrderStatic.salesorder, JsonKit.toJson(list));
+        String param= JsonKit.toJson(list);
+        String json = OrderStatic.post(OrderStatic.salesorder,param);
+        log.info("销售订单接口参数"+param);
         ResponseEntity responseEntity = JSON.parseObject(json, ResponseEntity.class);
+        log.info("销售订单接口结果"+JsonKit.toJson(responseEntity));
+
         if (responseEntity.getCode() == 0) {
             try {
                 Db.tx(() -> {
@@ -637,7 +645,13 @@ public class OrderService {
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error(e.getMessage());
+                log.error("销售订单接口参数"+param);
+                log.error("销售订单接口结果"+JsonKit.toJson(responseEntity));
             }
+        }
+        else{
+            log.error("销售订单接口参数"+param);
+            log.error("销售订单接口结果"+JsonKit.toJson(responseEntity));
         }
     }
 
@@ -679,9 +693,12 @@ public class OrderService {
             r.set("salesOrderLines",salesOrderLines);
             list.add(r);
         }
-
-        String json = OrderStatic.post(OrderStatic.salesdelivery, JsonKit.toJson(list));
+        String param=JsonKit.toJson(list);
+        String json = OrderStatic.post(OrderStatic.salesdelivery,param );
+        log.info("销售交货接口参数"+param);
         ResponseEntity responseEntity = JSON.parseObject(json, ResponseEntity.class);
+        log.info("销售交货接口结果"+JsonKit.toJson(responseEntity));
+
         if (responseEntity.getCode() == 0) {
             try {
                 Db.tx(() -> {
@@ -697,7 +714,13 @@ public class OrderService {
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error(e.getMessage());
+                log.error("销售交货接口参数"+param);
+                log.error("销售交货接口结果"+JsonKit.toJson(responseEntity));
             }
+        }
+        else{
+            log.error("销售交货接口参数"+param);
+            log.error("销售交货接口结果"+JsonKit.toJson(responseEntity));
         }
 
     }

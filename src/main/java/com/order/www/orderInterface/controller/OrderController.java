@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.jfinal.aop.Inject;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.Ret;
+import com.jfinal.log.Log;
 import com.order.www.orderInterface.entity.*;
 import com.order.www.orderInterface.service.OrderService;
 import top.hequehua.swagger.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
  */
 @Api( tags="order", description = "订单接口")
 public class OrderController extends Controller {
+	Log log = Log.getLog(OrderController.class);
 	@Inject
 	OrderService orderService;
 	@ApiOperation(tags="订单分账", methods={RequestMethod.GET,RequestMethod.POST},produces = "application/json",description ="分账信息" )
@@ -49,7 +51,8 @@ public class OrderController extends Controller {
 	})
 	public void GetTransfer(){
 		String result=getRawData();
-		System.out.println(result);
+
+		log.info("订单分账参数"+result);
 		try {
 			List<TransferData> orderReturns=JSON.parseArray(result, TransferData.class);
 			//TransferData orderReturn= JSON.parseObject(result, TransferData.class);
@@ -57,7 +60,9 @@ public class OrderController extends Controller {
 			orderService.GetTransfer(orderReturns);
 			renderJson(Ret.ok());
 		}catch (Exception e){
+			log.error(e.getMessage());
 			renderJson(Ret.fail());
+
 		}
 
 	}
@@ -117,12 +122,14 @@ public class OrderController extends Controller {
 	})
 	public void SendOrder(){
 		String result=getRawData();
-		System.out.println(result);
+		System.out.println("订单分发接口参数"+result);
+		log.info("订单分发接口参数"+result);
 		try {
 			OrderEntity orderEntity=JSON.parseObject(result, OrderEntity.class);
 			orderService.SendOrder(orderEntity);
 			renderJson(Ret.ok());
 		}catch (Exception e){
+			log.error(e.getMessage());
 			renderJson(Ret.fail());
 		}
 
@@ -164,12 +171,14 @@ public class OrderController extends Controller {
 	})
 	public void GetMoney(){
 		String result=getRawData();
-		System.out.println(result);
+		System.out.println("获取打款信息参数"+result);
+		log.info("获取打款信息参数"+result);
 		try {
 			GetMoney money=JSON.parseObject(result, GetMoney.class);
 			orderService.getMoney(money);
 			renderJson(Ret.ok());
 		}catch (Exception e){
+			log.error(e.getMessage());
 			renderJson(Ret.fail());
 		}
 
@@ -187,12 +196,14 @@ public class OrderController extends Controller {
 	})
 	public void ChangeOrderStatus(){
 		String result=getRawData();
-		System.out.println(result);
+		System.out.println("订单状态改变参数"+result);
+		log.info("订单状态改变参数"+result);
 		try {
 			OrderEntity money=JSON.parseObject(result, OrderEntity.class);
 			orderService.changeOrderStatus(money);
 			renderJson(Ret.ok());
 		}catch (Exception e){
+			log.error(e.getMessage());
 			renderJson(Ret.fail());
 		}
 
