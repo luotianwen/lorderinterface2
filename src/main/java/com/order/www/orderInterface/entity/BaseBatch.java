@@ -16,7 +16,13 @@ public abstract class BaseBatch<M extends BaseBatch<M>> extends Model<M> impleme
 	public java.lang.String getId() {
 		return getStr("id");
 	}
+	public java.lang.String getCardCode() {
+		return getStr("cardCode");
+	}
 
+	public void setCardCode(java.lang.String shipperID) {
+		set("cardCode", shipperID);
+	}
 	/**
 	 * 批次号，订单汇集时生成的编号
 	 */

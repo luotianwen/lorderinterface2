@@ -15,11 +15,13 @@ public abstract class BaseOrderTask<M extends BaseOrderTask<M>> extends Model<M>
 		set("shipperID", shipperID);
 	}
 
-	/**
-	 * 订单集成ID，UUID
-	 */
-	public java.lang.String getShipperID() {
-		return getStr("shipperID");
+
+	public java.lang.String getCardCode() {
+		return getStr("cardCode");
+	}
+
+	public void setCardCode(java.lang.String shipperID) {
+		set("cardCode", shipperID);
 	}
 	/**
 	 * /**

@@ -8,6 +8,49 @@ import com.jfinal.plugin.activerecord.IBean;
  */
 @SuppressWarnings("serial")
 public abstract class BaseBatchLine<M extends BaseBatchLine<M>> extends Model<M> implements IBean {
+	/**
+	 * 供应商id
+	 */
+	public void setSupplierID(int id) {
+		set("supplierID", id);
+	}
+
+	/**
+	 * 供应商id
+	 */
+	public int getSupplierID() {
+		return getInt("supplierID");
+	}
+
+	/**
+	 * 订单集成行ID,UUID
+	 */
+	public void setSupplierName(java.lang.String id) {
+		set("supplierName", id);
+	}
+
+	/**
+	 * 订单集成行ID,UUID
+	 */
+	public java.lang.String getSupplierName() {
+		return getStr("supplierName");
+	}
+
+
+	public void setProductClass(java.lang.String productClass) {
+		set("product_class", productClass);
+	}
+	public void setWhareHouse(java.lang.String productClass) {
+		set("whareHouse", productClass);
+	}
+	public java.lang.String getWhareHouse() {
+		return getStr("whareHouse");
+	}
+
+
+	public java.lang.String getProductClass() {
+		return getStr("product_class");
+	}
 
 	/**
 	 * 订单集成行ID，UUID

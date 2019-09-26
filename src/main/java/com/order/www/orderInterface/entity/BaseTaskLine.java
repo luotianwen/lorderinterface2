@@ -56,7 +56,13 @@ public abstract class BaseTaskLine<M extends BaseTaskLine<M>> extends Model<M> i
 	public void setPoolTaskId(java.lang.String poolTaskId) {
 		set("pool_task_id", poolTaskId);
 	}
-	
+	public java.lang.String getCardCode() {
+		return getStr("cardCode");
+	}
+
+	public void setCardCode(java.lang.String shipperID) {
+		set("cardCode", shipperID);
+	}
 	/**
 	 * 订单集成ID，UUID
 	 */
