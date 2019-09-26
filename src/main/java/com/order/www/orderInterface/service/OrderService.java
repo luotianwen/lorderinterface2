@@ -94,7 +94,7 @@ public class OrderService {
                 bl.setWhareHouse(tl.getCardCode());
                 Db.tx(() -> {
                     bl.save();
-                    Db.update("update pool_task  set isHave='1' where id=?", tl.getPoolTaskId());
+                    Db.update("update pool_task  set haveAmount='1' where id=?", tl.getPoolTaskId());
                     Db.update("update pool_task_line set batch_num =?,whareHouse=? where id=?", no, tl.getCardCode(), tl.getId());
                     return true;
                 });
@@ -171,7 +171,7 @@ public class OrderService {
 
                 Db.tx(() -> {
 
-                    Db.update("update pool_task  set isHave='1' where id=?", tl.getPoolTaskId());
+                    Db.update("update pool_task  set haveAmount='1' where id=?", tl.getPoolTaskId());
                     Db.update("update pool_task_line set batch_num =?,whareHouse=? where id=?", no, ck, tl.getId());
                     return true;
                 });
