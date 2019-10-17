@@ -42,9 +42,16 @@ public class Test {
         } catch (Exception e) {
             e.printStackTrace();
         }*/
-        journal();
+         journal();
         salesorder();
         salesdelivery();
+        stock();
+    }
+    public static void  stock(){
+        String url=sap+"v1/stock";
+        url=url+"shipperId=&shipperName=&shipperType=&itemCode=899568";
+        System.out.println(url);
+        System.out.println(post(url,""));
     }
     public static void  journal(){
         String url=sap+"v1/journal";

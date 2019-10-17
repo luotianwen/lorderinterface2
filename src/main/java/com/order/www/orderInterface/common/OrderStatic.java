@@ -2,11 +2,11 @@ package com.order.www.orderInterface.common;
 
 
 import com.jfinal.kit.PropKit;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -33,7 +33,8 @@ public class OrderStatic {
     //销售交货接口  接口地址：http://172.17.250.191:9091/v1/salesdelivery
     public static final String salesdelivery=PropKit.get("sap.url")+"/v1/salesdelivery";
 
-
+    //销售交货接口  接口地址：http://172.17.250.191:9091/v1/stock
+    public static final String salesstock=PropKit.get("sap.url")+"/v1/stock?itemCode=";
 
     public static String md5(String plainText){
         byte[] secretBytes = null;
@@ -49,6 +50,47 @@ public class OrderStatic {
         }
 
         return md5code;
+    }
+    /**
+     * 发送 post请求访问本地应用并根据传递参数不同返回不同结果
+     */
+    public static String get(String url) {
+        String str="";
+        // 创建默认的httpClient实例.
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        // 创建httppost，
+        HttpGet httppost = new HttpGet(url);
+        httppost.addHeader("Content-Type", "application/json");
+
+        // 创建参数队列
+        try {
+            //httppost.setEntity(new StringEntity(params, "UTF-8"));
+            CloseableHttpResponse response = httpclient.execute(httppost);
+            try {
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    str= EntityUtils.toString(entity, "UTF-8");
+
+                }
+            } finally {
+                response.close();
+            }
+
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e1) {
+            e1.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // 关闭连接,释放资源
+            try {
+                httpclient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return str;
     }
     /**
      * 发送 post请求访问本地应用并根据传递参数不同返回不同结果

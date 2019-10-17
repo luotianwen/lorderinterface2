@@ -3,27 +3,20 @@ package com.order.www.orderInterface;
 
 import com.jfinal.config.*;
 import com.jfinal.ext.proxy.CglibProxyFactory;
-import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Prop;
 import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
-import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.cron4j.Cron4jPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.server.undertow.UndertowServer;
 import com.jfinal.template.Engine;
-import com.order.www.orderInterface.common.OrderStatic;
 import com.order.www.orderInterface.entity._MappingKit;
 import com.order.www.orderInterface.routes.FrontApiRoutes;
-import com.order.www.orderInterface.task.OrderCronTask;
-import com.order.www.orderInterface.task.OrderDeliverTask;
+import com.order.www.orderInterface.task.OrderB2CBatchTask;
 import top.hequehua.swagger.config.SwaggerPlugin;
 import top.hequehua.swagger.handler.WebJarsHandler;
 import top.hequehua.swagger.model.SwaggerDoc;
 import top.hequehua.swagger.routes.MySwaggerRoutes;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  */
@@ -46,8 +39,8 @@ public class DemoConfig extends JFinalConfig {
      // new OrderBatchTask().run();
 		//new OrderCronTask().run();
 		//new OrderDeliverTask().run();
-
-		List<Record> rs=new ArrayList<>();
+		 new OrderB2CBatchTask().run();
+		/*List<Record> rs=new ArrayList<>();
 		Record r=new Record();
         r.set("profitType","1");
 		r.set("omsNo","DD2019090909");
@@ -62,7 +55,7 @@ public class DemoConfig extends JFinalConfig {
 		r.set("rate","0.98");
 		rs.add(r);
 		String data=OrderStatic.post(OrderStatic.journal, JsonKit.toJson(rs));
-		System.out.println(data);
+		System.out.println(data);*/
 	}
 
 	/**

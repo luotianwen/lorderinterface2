@@ -1,7 +1,5 @@
 package com.order.www.orderInterface.entity;
 
-import com.order.www.orderInterface.entity.BaseTaskLine;
-
 import java.util.List;
 
 /**
@@ -11,13 +9,13 @@ import java.util.List;
 public class TaskLine extends BaseTaskLine<TaskLine> {
     public static final TaskLine dao = new TaskLine().dao();
 	public List<TaskLine> getTls(String taskid){
-	    return this.find("select  ptl.* ptl.* ,pt.cardCode from  pool_task pt,pool_task_line ptl " +
+	    return this.find("select  ptl.*   ,pt.cardCode from  pool_task pt,pool_task_line ptl " +
                 " where pool_task_id=pt.id and  pt.task_type='1' and ptl.batch_num is null and ptl.pool_task_id=?",taskid);
     }
 
     public List<TaskLine> getB2cTls(String no, String s) {
         return this.find("select ptl.*,pt.cardCode from pool_task pt,pool_task_line ptl " +
-        "where ptlptl.pool_task_id=pt.id and  pt.task_type='0' and ptl.product_no =? and ptl.product_Class=? and ptl.batch_num is null and pt.erp_no is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) "
+        "where  ptl.pool_task_id=pt.id and  pt.task_type='0' and ptl.product_no =? and ptl.product_Class=? and ptl.batch_num is null and pt.erp_no is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) "
                  ,no,s);
     }
 }

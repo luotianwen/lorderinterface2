@@ -1,4 +1,4 @@
-cron4j=getorder,batch,deliver
+cron4j=getorder,batch,deliver,b2c
 getorder.cron=04 00 * * *
 getorder.class=com.order.www.orderInterface.task.OrderCronTask
 getorder.daemon=true
@@ -8,6 +8,11 @@ batch.cron=04 01 * * *
 batch.class=com.order.www.orderInterface.task.OrderB2BBatchTask
 batch.daemon=true
 batch.enable=true
+
+b2c.cron=04 02 * * *
+b2c.class=com.order.www.orderInterface.task.OrderB2CBatchTask
+b2c.daemon=true
+b2c.enable=true
 
 deliver.cron=00 23 * * *
 deliver.class=com.order.www.orderInterface.task.OrderDeliverTask

@@ -3,7 +3,9 @@ package com.order.www.orderInterface.task;
 import com.jfinal.aop.Aop;
 import com.jfinal.log.Log;
 import com.order.www.orderInterface.service.OrderService;
-
+/*
+销售订单接口
+ */
 public class SapOrderTask implements Runnable {
     Log log = Log.getLog(SapOrderTask.class);
     static OrderService orderService = Aop.get(OrderService.class);
