@@ -61,7 +61,7 @@ public class OrderService {
             Batch batch = new Batch();
             batch.setId(bid);
             batch.setBatchNum(no);
-
+            batch.setOrderClass();
             //batch.setBatchCreator();
             batch.setBatchGenDatetime(new Date());
             Map map = new HashMap();
@@ -632,6 +632,7 @@ public class OrderService {
         for (Record task : tasklist
         ) {
             Record r = new Record();
+            r.set("cardCode",task.getStr("cardCode"));
             r.set("cardCode",task.getStr("cardCode"));
             r.set("docDate",task.getDate("BATCH_GEN_DATETIME"));
             r.set("sourceDocEntry",task.getStr("BATCH_NUM"));

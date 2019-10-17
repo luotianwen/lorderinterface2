@@ -13,9 +13,18 @@ public abstract class BaseBatch<M extends BaseBatch<M>> extends Model<M> impleme
 		set("id", id);
 	}
 	
+	public java.lang.String getOrderClass() {
+		return getStr("orderClass");
+	}
+
+	public void setOrderClass(java.lang.String orderClass) {
+		set("id", orderClass);
+	}
+
 	public java.lang.String getId() {
 		return getStr("id");
 	}
+
 	public java.lang.String getCardCode() {
 		return getStr("cardCode");
 	}
