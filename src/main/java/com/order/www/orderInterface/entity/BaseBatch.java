@@ -18,7 +18,7 @@ public abstract class BaseBatch<M extends BaseBatch<M>> extends Model<M> impleme
 	}
 
 	public void setOrderClass(java.lang.String orderClass) {
-		set("id", orderClass);
+		set("orderClass", orderClass);
 	}
 
 	public java.lang.String getId() {

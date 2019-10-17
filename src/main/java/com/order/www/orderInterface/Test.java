@@ -42,10 +42,10 @@ public class Test {
         } catch (Exception e) {
             e.printStackTrace();
         }*/
-         journal();
+         //journal();
         salesorder();
-        salesdelivery();
-        stock();
+        //salesdelivery();
+        //stock();
     }
     public static void  stock(){
         String url=sap+"v1/stock";

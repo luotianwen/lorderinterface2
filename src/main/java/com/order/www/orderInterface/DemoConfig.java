@@ -12,7 +12,7 @@ import com.jfinal.server.undertow.UndertowServer;
 import com.jfinal.template.Engine;
 import com.order.www.orderInterface.entity._MappingKit;
 import com.order.www.orderInterface.routes.FrontApiRoutes;
-import com.order.www.orderInterface.task.OrderB2CBatchTask;
+import com.order.www.orderInterface.task.SapDeliveryTask;
 import top.hequehua.swagger.config.SwaggerPlugin;
 import top.hequehua.swagger.handler.WebJarsHandler;
 import top.hequehua.swagger.model.SwaggerDoc;
@@ -39,7 +39,7 @@ public class DemoConfig extends JFinalConfig {
      // new OrderBatchTask().run();
 		//new OrderCronTask().run();
 		//new OrderDeliverTask().run();
-		 new OrderB2CBatchTask().run();
+		 new SapDeliveryTask().run();
 		/*List<Record> rs=new ArrayList<>();
 		Record r=new Record();
         r.set("profitType","1");
