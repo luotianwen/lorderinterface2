@@ -39,11 +39,11 @@ public abstract class BaseTaskLine<M extends BaseTaskLine<M>> extends Model<M> i
 	}
 
 	public void setSAPSupplierID(java.lang.String id) {
-		set("sAPSupplierID", id);
+		set("sapSupplierID", id);
 	}
 
 	public java.lang.String getSAPSupplierID() {
-		return getStr("sAPSupplierID");
+		return getStr("sapSupplierID");
 	}
 
 	public void setPayAmountSum(java.math.BigDecimal payAmountSum) {

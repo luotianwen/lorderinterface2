@@ -37,11 +37,11 @@ public abstract class BaseOrderTask<M extends BaseOrderTask<M>> extends Model<M>
 	}
 
 	public void setSAPSupplierID(java.lang.String id) {
-		set("sAPSupplierID", id);
+		set("sapSupplierID", id);
 	}
 
 	public java.lang.String getSAPSupplierID() {
-		return getStr("sAPSupplierID");
+		return getStr("sapSupplierID");
 	}
 
 

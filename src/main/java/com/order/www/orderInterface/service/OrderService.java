@@ -343,7 +343,6 @@ public class OrderService {
                 ot.setSaleGroup(oe.getShipperType() + "");
                 ot.setShipperName(oe.getShipperName());
                 ot.setShipperID(oe.getShipperID() + "");
-                ot.setSAPSupplierID(oe.getSapSupplierID());
                 ot.setPayableAmount(new BigDecimal(oe.getPayableAmount()));
                 ot.setReductionAmount(new BigDecimal(oe.getReductionAmount()));
                 ot.setScore(new BigDecimal(oe.getScore()));
@@ -523,7 +522,6 @@ public class OrderService {
         ot.setShipperName(oe.getShipperName());
         ot.setShipperID(oe.getShipperID() + "");
 
-        ot.setSAPSupplierID(oe.getSapSupplierID());
         ot.setPayableAmount(new BigDecimal(oe.getPayableAmount()));
         ot.setReductionAmount(new BigDecimal(oe.getReductionAmount()));
         ot.setScore(new BigDecimal(oe.getScore()));
