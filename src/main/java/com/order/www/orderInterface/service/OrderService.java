@@ -487,12 +487,21 @@ public class OrderService {
             tk.setSupplierID(it.getSupplierID());
             tk.setSupplierName(it.getSupplierName());
             tk.setProductClass(it.getProductType() + "");
+
+            tk.setPayAmount(new BigDecimal(it.getPayAmount()));
+            tk.setPayAmountSum(new BigDecimal(it.getPayAmountSum()));
+            tk.setSAPSupplierID(it.getSapSupplierID());
+            tk.setPriceSum(new BigDecimal(it.getPriceSum()));
+            tk.setReductionAmount(new BigDecimal(it.getReductionAmount()));
+            tk.setAgentType(it.getAgentType());
+            tk.setScore(new BigDecimal(it.getScore()));
+
             tks.add(tk);
-            db = db.add(new BigDecimal(it.getPrice()));
+
         }
 
         OrderTask ot = new OrderTask();
-        ot.setTaskAmount(db);
+        ot.setTaskAmount(new BigDecimal(oe.getPayAmount()));
         ot.setId(oid);
         ot.setTaskStatus(1);
         ot.setTaskNo(oe.getOrderID());
@@ -513,6 +522,15 @@ public class OrderService {
         ot.setCreateDate(new Date());
         ot.setShipperName(oe.getShipperName());
         ot.setShipperID(oe.getShipperID() + "");
+
+        ot.setSAPSupplierID(oe.getSapSupplierID());
+        ot.setPayableAmount(new BigDecimal(oe.getPayableAmount()));
+        ot.setReductionAmount(new BigDecimal(oe.getReductionAmount()));
+        ot.setScore(new BigDecimal(oe.getScore()));
+        ot.setAgentType(oe.getAgentType());
+        ot.setSAPSupplierID(oe.getSapSupplierID());
+
+
         for (TaskLine t : tks
         ) {
             t.setPoolTaskNo(no);
