@@ -8,6 +8,51 @@ import com.jfinal.plugin.activerecord.IBean;
  */
 @SuppressWarnings("serial")
 public abstract class BaseTaskLine<M extends BaseTaskLine<M>> extends Model<M> implements IBean {
+
+	public void setPayAmount(java.math.BigDecimal payAmount) {
+		set("payAmount", payAmount);
+	}
+	public java.math.BigDecimal getPayAmount() {
+		return get("payAmount");
+	}
+	public void setReductionAmount(java.math.BigDecimal reductionAmount) {
+		set("reductionAmount", reductionAmount);
+	}
+	public java.math.BigDecimal getReductionAmount() {
+		return get("reductionAmount");
+	}
+
+	public void setPriceSum(java.math.BigDecimal priceSum) {
+		set("priceSum", priceSum);
+	}
+	public java.math.BigDecimal getPriceSum() {	return get("priceSum");	}
+	public void setScore(java.math.BigDecimal score) {
+		set("score", score);
+	}
+	public java.math.BigDecimal getScore() {	return get("score");	}
+	public void setAgentType(java.lang.String id) {
+		set("agentType", id);
+	}
+
+	public java.lang.String getAgentType() {
+		return getStr("agentType");
+	}
+
+	public void setSAPSupplierID(java.lang.String id) {
+		set("sAPSupplierID", id);
+	}
+
+	public java.lang.String getSAPSupplierID() {
+		return getStr("sAPSupplierID");
+	}
+
+	public void setPayAmountSum(java.math.BigDecimal payAmountSum) {
+		set("payAmountSum", payAmountSum);
+	}
+	public java.math.BigDecimal getPayAmountSum() {
+		return get("payAmountSum");
+	}
+
 	/**
 	 * 供应商id
 	 */

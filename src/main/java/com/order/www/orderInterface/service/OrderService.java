@@ -68,23 +68,10 @@ public class OrderService {
             ) {
 
 
-                StockReData sr=getSapStockByItemCode(tl.getStr("product_no"));
+               // StockReData sr=getSapStockByItemCode(tl.getStr("product_no"));
 
                 int sjkc = 0;//调取库存接口
-                String ck = "";
-                if(null!=sr&&sr.getCode().equals("0")&&sr.getData().size()>0){
-                    sjkc=sr.getData().get(0).getQuantity();
-                    ck=sr.getData().get(0).getWharehouse();
-                }
-                else{
-                    continue;
-                }
-
-                if (tl.getAmount() > sjkc) {
-                    continue;
-                }
-
-
+                String ck = "A16";//B2B默认仓库
                 db = db.add(tl.getRelievePrice());
                 String oid = UUID.randomUUID().toString().replaceAll("-", "");
                 BatchLine bl = new BatchLine();
@@ -131,19 +118,18 @@ public class OrderService {
         return sr;
     }
     public void b2cWarhouse(String product_Class) {
-        List<Record> ots = Db.find("select ptl.product_no as no ,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
+        List<Record> ots = Db.find("select ptl.product_no as no ，pt.shipperID ,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
                 "where pool_task_id=pt.id and  pt.task_type='0' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
-                "GROUP BY    ptl.product_no ");
+                "GROUP BY    ptl.product_no，pt.shipperID ");
 
 
         //读取前一天的订单数据
         for (Record r : ots
         ) {
+            int sjkc = 100000;//调取库存接口
+            String ck = "A16";
 
             StockReData sr=getSapStockByItemCode(r.getStr("no"));
-
-            int sjkc = 0;//调取库存接口
-            String ck = "";
             if(null!=sr&&sr.getCode().equals("0")&&sr.getData().size()>0){
                 sjkc=sr.getData().get(0).getQuantity();
                 ck=sr.getData().get(0).getWharehouse();
@@ -256,62 +242,14 @@ public class OrderService {
                 "    \"Result\": {\n" +
                 "        \"Total\": 1,\n" +
                 "        \"Surplus\": 0,\n" +
-                "        \"List\": [\n" +
-                "            {\n" +
-                "                \"OrderID\": \"LD201908291024071292071\",\n" +
-                "                \"ReceiveName\": \"某某某\",\n" +
-                "                \"Mobile\": \"13022225669\",\n" +
-                "                \"CardCode\": \"800099\",\n" +
-                "                \"DocDueDate\": \"2019/8/29 10:24:07\",\n" +
-                "                \"OrderAddress\": \"某个街道的房间\",\n" +
-                "                \"ProName\": \"北京\",\n" +
-                "                \"CityName\": \"市辖区\",\n" +
-                "                \"DisName\": \"朝阳区\",\n" +
-                "                \"UserID\": \"77552\",\n" +
-                "                \"Remark\": \"\",\n" +
-                "                \"OrderClass\": 0,\n" +
-                "                \"UserName\": \"丑\",\n" +
-                "                \"PayName\": \"账户余额\",\n" +
-                "                \"ActivityType\": 0,\n" +
-                "                \"ActivityTypeName\": \"\",\n" +
-                "                \"ActivityID\": 0,\n" +
-                "                \"ActivityName\": \"\",\n" +
-                "                \"CreateUserID\": 0,\n" +
-                "                \"CreateUserName\": \"\",\n" +
-                "                \"CouponID\": 0,\n" +
-                "                \"CouponName\": \"\",\n" +
-                "                \"ShipperType\":1,\n" +
-                "                \"ShipperID\":1,\n" +
-                "                \"ShipperName\":\"test1\",\n" +
-                "                \"Items\": [\n" +
-                "                    {\n" +
-                "                        \"ItemCode\": \"899335\",\n" +
-                "                        \"QuanTity\": 1,\n" +
-                "                        \"Price\": 0,\n" +
-                "                        \"ProductName\": \"净牌-雪莲滋养贴100片\",\n" +
-                "                        \"Score\": 0,\n" +
-                "                        \"SupplierID\":0,\n" +
-                "                        \"SupplierName\":\"众生平安\",\n" +
-                "                        \"ProductType\":1\n" +
-                "                    },\n" +
-                "                    {\n" +
-                "                        \"ItemCode\": \"888890-01\",\n" +
-                "                        \"QuanTity\": 1,\n" +
-                "                        \"Price\": 0,\n" +
-                "                        \"ProductName\": \"新版净牌-雪莲滋养贴200片\",\n" +
-                "                        \"Score\": 800,\n" +
-                "                        \"SupplierID\":0,\n" +
-                "                        \"SupplierName\":\"众生平安\",\n" +
-                "                        \"ProductType\":1\n" +
-                "                    }\n" +
-                "                ]\n" +
-                "            }\n" +
+                "        \"List\": [{\"OrderID\":\"LD201910211724580144648\",\"ReceiveName\":\"张帅伟\",\"Mobile\":\"13020831303\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019-10-21T17:25:01\",\"OrderAddress\":\"中铁国际城12号楼2单元1703室\",\"ProName\":\"北京\",\"CityName\":\"市辖区\",\"DisName\":\"朝阳区\",\"UserID\":77742,\"Remark\":\"\",\"OrderClass\":0,\"UserName\":\"丑\",\"PayName\":\"账户余额\",\"ActivityType\":0,\"ActivityTypeName\":\"\",\"ActivityID\":0,\"ActivityName\":\"\",\"CreateUserID\":0,\"CreateUserName\":\"\",\"CouponID\":0,\"CouponName\":\"\",\"Items\":[{\"ItemCode\":\"888890-01\",\"QuanTity\":1,\"Price\":3300.00,\"ProductName\":\"新版净牌-雪莲滋养贴200\",\"Score\":800.00,\"SupplierID\":0,\"SupplierName\":\"平台供货\",\"ProductType\":1,\"PayAmount\":3300.00,\"PayAmountSum\":3300.00,\"PriceSum\":3300.00,\"ReductionAmount\":0.00,\"AgentType\":6511,\"SAPSupplierID\":\"900001\"}],\"ShipperType\":2,\"ShipperID\":0,\"ShipperName\":\"平台供货商\",\"PayableAmount\":3300.00,\"PayAmount\":3300.00,\"ReductionAmount\":0.00,\"Score\":800.00,\"AgentType\":6511,\"SAPSupplierID\":\"900001\"}\n" +
+
                 "        ]\n" +
                 "    },\n" +
                 "    \"Msg\": \"成功\"\n" +
                 "}";
        // String json = OrderStatic.lxdpost(OrderStatic.SendOrder, map);
-        //System.out.println(json);
+        System.out.println(json);
         OrderJson oj = new OrderJson();
         oj.setContent(json);
         oj.setCreateDate(new Date());
@@ -325,7 +263,6 @@ public class OrderService {
             log.error("order task " + datas.getMsg());
         } else {
             List<OrderEntity> oes = datas.getResult().getList();
-            BigDecimal db = BigDecimal.ZERO;
 
 
             Date currentTime = new Date();
@@ -367,16 +304,23 @@ public class OrderService {
                     tk.setAmount(it.getQuanTity());
                     tk.setName(it.getProductName());
                     tk.setLxbAmount(new BigDecimal(it.getScore()));
-                    tk.setRelievePrice(new BigDecimal(it.getPrice()));
+                    //tk.setRelievePrice(new BigDecimal(it.getPayAmountSum()));
                     tk.setSupplierID(it.getSupplierID());
                     tk.setSupplierName(it.getSupplierName());
                     tk.setProductClass(it.getProductType() + "");
+                    tk.setPayAmount(new BigDecimal(it.getPayAmount()));
+                    tk.setPayAmountSum(new BigDecimal(it.getPayAmountSum()));
+                    tk.setSAPSupplierID(it.getSapSupplierID());
+                    tk.setPriceSum(new BigDecimal(it.getPriceSum()));
+                    tk.setReductionAmount(new BigDecimal(it.getReductionAmount()));
+                    tk.setAgentType(it.getAgentType());
+                    tk.setScore(new BigDecimal(it.getScore()));
                     tks.add(tk);
-                    db = db.add(new BigDecimal(it.getPrice()));
+                   // db = db.add(new BigDecimal(it.getPrice()));
                 }
 
                 OrderTask ot = new OrderTask();
-                ot.setTaskAmount(db);
+                ot.setTaskAmount(new BigDecimal(oe.getPayAmount()));
                 ot.setCardCode(oe.getCardCode());
                 ot.setId(oid);
                 ot.setTaskStatus(1);
@@ -399,6 +343,12 @@ public class OrderService {
                 ot.setSaleGroup(oe.getShipperType() + "");
                 ot.setShipperName(oe.getShipperName());
                 ot.setShipperID(oe.getShipperID() + "");
+                ot.setSAPSupplierID(oe.getSapSupplierID());
+                ot.setPayableAmount(new BigDecimal(oe.getPayableAmount()));
+                ot.setReductionAmount(new BigDecimal(oe.getReductionAmount()));
+                ot.setScore(new BigDecimal(oe.getScore()));
+                ot.setAgentType(oe.getAgentType());
+                ot.setSAPSupplierID(oe.getSapSupplierID());
                 for (TaskLine t : tks
                 ) {
                     t.setPoolTaskNo(no);
@@ -641,17 +591,10 @@ public class OrderService {
      * 凭单接口
      */
     public void sapProfit() {
-        List<Record> tasklist = Db.find(
-                "select DISTINCT pt.id ,pt.task_no" +
-                        "from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm" +
-                        "where     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null");
+        List<Record> tasklist = Db.find("select DISTINCT pt.id ,pt.task_no from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null");
         for (Record task : tasklist
         ) {
-            List<Record> list = Db.find(
-                    "select pt.task_no as platNo,pt.task_type as orderClass ,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName," +
-                            "ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id " +
-                            "from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm" +
-                            "where     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null and pt.id=?", task.getStr("id"));
+            List<Record> list = Db.find("select pt.task_no as platNo,pt.task_type as orderClass ,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName,  ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id  from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where  ptlm.userType=3 and    pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null and pt.id=?", task.getStr("id"));
             String param=JsonKit.toJson(list);
             String json = OrderStatic.post(OrderStatic.journal,param);
             log.info("凭单接口参数"+param);
@@ -714,6 +657,7 @@ public class OrderService {
             }
             r.set("salesOrderLines",salesOrderLines);
             list.add(r);
+            break;
         }
         String param= JsonKit.toJson(list);
         String json = OrderStatic.post(OrderStatic.salesorder,param);
@@ -755,13 +699,13 @@ public class OrderService {
         List<Record> list=new ArrayList<>();
         List<Record> list2=new ArrayList<>();
         for (Record task:tasklist) {
-            List<Record> os = Db.find("select *  from   pool_task pt,pool_task_line ptl   where   pt.task_status='1' and  pt.id=ptl.pool_task_id and ptl.batch_num=?",task.getStr("BATCH_NUM"));
+            List<Record> os = Db.find("select  *   from   pool_task pt,pool_task_line ptl where    pt.task_status='1' and  pt.id=ptl.pool_task_id and ptl.batch_num=?",task.getStr("BATCH_NUM"));
              if(null!=os&&os.size()>0)
             {
                 continue;
             }
             list2.add(task);
-            List<Record> salesOrderLines1=Db.find("select * from pool_batch_line where POOL_BATCH_ID=?",task.getStr("id"));
+            List<Record> salesOrderLines1=Db.find("select  ptl.* from pool_batch_line ptl,pool_task pt  where pt.id=ptl.pool_task_id    and ptl.POOL_BATCH_ID=?",task.getStr("id"));
 
             Record r=new Record();
 
@@ -787,7 +731,7 @@ public class OrderService {
                 r1.set("productType",r11.getStr("product_class"));
                 r1.set("itemCode",r11.getStr("PRODUCT_ID"));
                 r1.set("whsCode",r11.getStr("whareHouse"));
-                r1.set("price",r11.getBigDecimal("SUM_PRICE"));
+                r1.set("price",r11.getBigDecimal("pamount"));
                 r1.set("quantity",r11.getInt("AMOUNT"));
                 salesOrderLines.add(r1);
             }

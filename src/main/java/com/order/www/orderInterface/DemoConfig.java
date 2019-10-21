@@ -12,7 +12,7 @@ import com.jfinal.server.undertow.UndertowServer;
 import com.jfinal.template.Engine;
 import com.order.www.orderInterface.entity._MappingKit;
 import com.order.www.orderInterface.routes.FrontApiRoutes;
-import com.order.www.orderInterface.task.SapDeliveryTask;
+import com.order.www.orderInterface.task.OrderCronTask;
 import top.hequehua.swagger.config.SwaggerPlugin;
 import top.hequehua.swagger.handler.WebJarsHandler;
 import top.hequehua.swagger.model.SwaggerDoc;
@@ -36,26 +36,19 @@ public class DemoConfig extends JFinalConfig {
 	public void onStart() {
 
 		super.onStart();
-     // new OrderBatchTask().run();
-		//new OrderCronTask().run();
+       // new OrderBatchTask().run();
+		 new OrderCronTask().run();
+		//new OrderB2CBatchTask().run();
+		//new OrderB2BBatchTask().run();
 		//new OrderDeliverTask().run();
-		 new SapDeliveryTask().run();
-		/*List<Record> rs=new ArrayList<>();
-		Record r=new Record();
-        r.set("profitType","1");
-		r.set("omsNo","DD2019090909");
-		r.set("platNo","LD2019090909");
-		r.set("platTypeName","aa");
-		r.set("shipperId","1");
-		r.set("shipperName","aaa");
-		r.set("shipperType","1");
-		r.set("itemCode","1");
-		r.set("ratio","0.05");
-		r.set("amount","20");
-		r.set("rate","0.98");
-		rs.add(r);
-		String data=OrderStatic.post(OrderStatic.journal, JsonKit.toJson(rs));
-		System.out.println(data);*/
+		 //new SapDeliveryTask().run();
+		//new SapOrderTask().run();
+		//new SapProfitTask().run();
+     /*   String result="[{\"OrderID\":\"LD201910181422572826938\",\"Amount\":0.0,\"AmountType\":1,\"OrderDate\":\"2019-10-18T14:22:57\",\"ProductName\":\"佛初草三瓶装\",\"ProductNumber\":10,\"ItemCode\":\"800766\",\"CreateTime\":\"2019-10-18T14:25:50\",\"Item\":[{\"UserType\":0,\"TypeName\":\"门店分账\",\"Amount\":0.00,\"Proportion\":0.00},{\"UserType\":1,\"TypeName\":\"代理商分账\",\"Amount\":10940.00,\"Proportion\":0.60},{\"UserType\":2,\"TypeName\":\"供应商分账\",\"Amount\":7562.00,\"Proportion\":0.38},{\"UserType\":3,\"TypeName\":\"平台分账\",\"Amount\":199.00,\"Proportion\":0.01}]}]";
+		List<TransferData> orderReturns= JSON.parseArray(result, TransferData.class);
+		//TransferData orderReturn= JSON.parseObject(result, TransferData.class);
+		  OrderService orderService = Aop.get(OrderService.class);
+		orderService.GetTransfer(orderReturns);*/
 	}
 
 	/**

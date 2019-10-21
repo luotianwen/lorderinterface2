@@ -67,6 +67,21 @@ public class OrderEntity implements Serializable {
     private int shipperType;
     private int shipperID;
     private String shipperName;
+    private double  payAmount;
+    private double payableAmount;//应付现金
+    private double reductionAmount;//减免金额
+    private double score;//莲香币
+    private String agentType;//代理商标识
+    private String sapSupplierID;//SAP供应商ID
+
+    public double getPayAmount() {
+        return payAmount;
+    }
+
+    public void setPayAmount(double payAmount) {
+        this.payAmount = payAmount;
+    }
+
     private List<ItemsBean> Items;
     private int status;
 
@@ -109,6 +124,46 @@ public class OrderEntity implements Serializable {
 
     public String getDisName() {
         return disName;
+    }
+
+    public double getPayableAmount() {
+        return payableAmount;
+    }
+
+    public void setPayableAmount(double payableAmount) {
+        this.payableAmount = payableAmount;
+    }
+
+    public double getReductionAmount() {
+        return reductionAmount;
+    }
+
+    public void setReductionAmount(double reductionAmount) {
+        this.reductionAmount = reductionAmount;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    public String getAgentType() {
+        return agentType;
+    }
+
+    public void setAgentType(String agentType) {
+        this.agentType = agentType;
+    }
+
+    public String getSapSupplierID() {
+        return sapSupplierID;
+    }
+
+    public void setSapSupplierID(String sapSupplierID) {
+        this.sapSupplierID = sapSupplierID;
     }
 
     public void setDisName(String disName) {
@@ -297,15 +352,69 @@ public class OrderEntity implements Serializable {
          * SupplierID : 0
          * SupplierName : 众生平安
          */
+        private double payAmount;//商品实付单价
+        private double reductionAmount;//减免金额
+        private double priceSum;//商品应付总价
+        private String agentType;//代理商标识
+        private String sapSupplierID;//SAP供应商ID
+        private double payAmountSum;//商品实付总价
 
         private String itemCode;
         private int quanTity;
-        private int price;
+        private double price;
         private String productName;
-        private int score;
+        private double score;
         private int supplierID;
         private String supplierName;
         private int productType;
+
+        public double getPayAmount() {
+            return payAmount;
+        }
+
+        public void setPayAmount(double payAmount) {
+            this.payAmount = payAmount;
+        }
+
+        public double getReductionAmount() {
+            return reductionAmount;
+        }
+
+        public void setReductionAmount(double reductionAmount) {
+            this.reductionAmount = reductionAmount;
+        }
+
+        public double getPriceSum() {
+            return priceSum;
+        }
+
+        public void setPriceSum(double priceSum) {
+            this.priceSum = priceSum;
+        }
+
+        public String getAgentType() {
+            return agentType;
+        }
+
+        public void setAgentType(String agentType) {
+            this.agentType = agentType;
+        }
+
+        public String getSapSupplierID() {
+            return sapSupplierID;
+        }
+
+        public void setSapSupplierID(String sapSupplierID) {
+            this.sapSupplierID = sapSupplierID;
+        }
+
+        public double getPayAmountSum() {
+            return payAmountSum;
+        }
+
+        public void setPayAmountSum(double payAmountSum) {
+            this.payAmountSum = payAmountSum;
+        }
 
         public int getProductType() {
             return productType;
@@ -331,11 +440,11 @@ public class OrderEntity implements Serializable {
             this.quanTity = quanTity;
         }
 
-        public int getPrice() {
+        public double getPrice() {
             return price;
         }
 
-        public void setPrice(int price) {
+        public void setPrice(double price) {
             this.price = price;
         }
 
@@ -347,11 +456,11 @@ public class OrderEntity implements Serializable {
             this.productName = productName;
         }
 
-        public int getScore() {
+        public double getScore() {
             return score;
         }
 
-        public void setScore(int score) {
+        public void setScore(double score) {
             this.score = score;
         }
 

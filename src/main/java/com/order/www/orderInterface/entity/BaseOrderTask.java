@@ -8,6 +8,48 @@ import com.jfinal.plugin.activerecord.IBean;
  */
 @SuppressWarnings("serial")
 public abstract class BaseOrderTask<M extends BaseOrderTask<M>> extends Model<M> implements IBean {
+
+
+	public void setPayableAmount(java.math.BigDecimal payAmount) {
+		set("payableAmount", payAmount);
+	}
+	public java.math.BigDecimal getPayableAmount() {
+		return get("payableAmount");
+	}
+	public void setReductionAmount(java.math.BigDecimal reductionAmount) {
+		set("reductionAmount", reductionAmount);
+	}
+	public java.math.BigDecimal getReductionAmount() {
+		return get("reductionAmount");
+	}
+
+	public void setScore(java.math.BigDecimal score) {
+		set("score", score);
+	}
+	public java.math.BigDecimal getScore() {	return get("score");	}
+
+	public void setAgentType(java.lang.String id) {
+		set("agentType", id);
+	}
+
+	public java.lang.String getAgentType() {
+		return getStr("agentType");
+	}
+
+	public void setSAPSupplierID(java.lang.String id) {
+		set("sAPSupplierID", id);
+	}
+
+	public java.lang.String getSAPSupplierID() {
+		return getStr("sAPSupplierID");
+	}
+
+
+
+
+
+
+
 	/**
 	 * 订单集成ID，UUID
 	 */
