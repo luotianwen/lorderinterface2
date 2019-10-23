@@ -29,7 +29,7 @@ public class OrderService {
      * 订单集合不合单，此类业务给出标识，按此标识识别订单类型
      */
     public void b2bbatch() {
-        List<Record> ots = Db.find("select DISTINCT(pt.id)as id,pt.task_type as orderclass from pool_task pt,pool_task_line ptl " +
+        List<Record> ots = Db.find("select DISTINCT(pt.id)as id,pt.task_type as orderclass , pt.agentType , pt.sapSupplierID  from pool_task pt,pool_task_line ptl " +
                 "where pool_task_id=pt.id and  pt.task_type='1'   and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY)");
 
         //List<Record> ots = Db.find("select id from pool_task where task_type='1' and  ptl.batch_num  is null and date(task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) ");
@@ -62,6 +62,8 @@ public class OrderService {
             batch.setId(bid);
             batch.setBatchNum(no);
             batch.setOrderClass(r.getStr("orderclass"));
+            batch.setAgentType(r.getStr("agentType"));
+            batch.setSAPSupplierID(r.getStr("sapSupplierID"));
             //batch.setBatchCreator();
             batch.setBatchGenDatetime(new Date());
             for (TaskLine tl : tls
@@ -75,6 +77,8 @@ public class OrderService {
                 db = db.add(tl.getRelievePrice());
                 String oid = UUID.randomUUID().toString().replaceAll("-", "");
                 BatchLine bl = new BatchLine();
+                bl.setAgentType(r.getStr("agentType"));
+                bl.setSAPSupplierID(r.getStr("sapSupplierID"));
                 bl.setId(oid);
                 bl.setPoolBatchId(bid);
                 bl.setProductId(tl.getProductNo());
@@ -118,7 +122,7 @@ public class OrderService {
         return sr;
     }
     public void b2cWarhouse(String product_Class) {
-        List<Record> ots = Db.find("select ptl.product_no as no ，pt.shipperID ,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
+        List<Record> ots = Db.find("select ptl.product_no as no ， pt.agentType , pt.sapSupplierID,pt.shipperID ,pt.saleGroup as shipperType,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
                 "where pool_task_id=pt.id and  pt.task_type='0' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
                 "GROUP BY    ptl.product_no，pt.shipperID ");
 
@@ -165,6 +169,9 @@ public class OrderService {
             batch.setId(bid);
             batch.setBatchNum(no);
             batch.setOrderClass(r.getStr("orderclass"));
+            batch.setAgentType(r.getStr("agentType"));
+            batch.setSAPSupplierID(r.getStr("sapSupplierID"));
+
             int amount = 0;
             batch.setBatchGenDatetime(new Date());
             List<TaskLine> tls = TaskLine.dao.getB2cTls(r.getStr("no"), product_Class);
@@ -208,7 +215,8 @@ public class OrderService {
             bl.setSupplierName(tl.getSupplierName());
             bl.setProductClass(tl.getProductClass());
             bl.setWhareHouse(ck);
-
+            bl.setAgentType(tl.getAgentType());
+            bl.setSAPSupplierID(tl.getSAPSupplierID());
             batch.setCardCode(tl.getCardCode());
             batch.setSumAmt(db);
             Db.tx(() -> {
@@ -237,7 +245,7 @@ public class OrderService {
         Map map = new HashMap();
         map.put("Number", "10");
 
-        String json=" {\n" +
+       /* String json=" {\n" +
                 "    \"Status\": 200,\n" +
                 "    \"Result\": {\n" +
                 "        \"Total\": 1,\n" +
@@ -247,9 +255,9 @@ public class OrderService {
                 "        ]\n" +
                 "    },\n" +
                 "    \"Msg\": \"成功\"\n" +
-                "}";
-       // String json = OrderStatic.lxdpost(OrderStatic.SendOrder, map);
-        System.out.println(json);
+                "}";*/
+        String json = OrderStatic.lxdpost(OrderStatic.SendOrder, map);
+       // System.out.println(json);
         OrderJson oj = new OrderJson();
         oj.setContent(json);
         oj.setCreateDate(new Date());

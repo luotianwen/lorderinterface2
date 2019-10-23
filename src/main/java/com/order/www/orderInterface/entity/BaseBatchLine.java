@@ -29,6 +29,23 @@ public abstract class BaseBatchLine<M extends BaseBatchLine<M>> extends Model<M>
 		set("supplierName", id);
 	}
 
+	public void setAgentType(java.lang.String id) {
+		set("agentType", id);
+	}
+
+	public java.lang.String getAgentType() {
+		return getStr("agentType");
+	}
+
+	public void setSAPSupplierID(java.lang.String id) {
+		set("sapSupplierID", id);
+	}
+
+	public java.lang.String getSAPSupplierID() {
+		return getStr("sapSupplierID");
+	}
+
+
 	/**
 	 * 订单集成行ID,UUID
 	 */
