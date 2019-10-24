@@ -74,7 +74,7 @@ public class OrderService {
 
                 int sjkc = 0;//调取库存接口
                 String ck = "A16";//B2B默认仓库
-                db = db.add(tl.getRelievePrice());
+                db = db.add(tl.getPayAmount());
                 String oid = UUID.randomUUID().toString().replaceAll("-", "");
                 BatchLine bl = new BatchLine();
                 bl.setAgentType(r.getStr("agentType"));
@@ -82,7 +82,7 @@ public class OrderService {
                 bl.setId(oid);
                 bl.setPoolBatchId(bid);
                 bl.setProductId(tl.getProductNo());
-                bl.setSumPrice(tl.getRelievePrice());
+                bl.setSumPrice(tl.getPayAmount());
                 bl.setAMOUNT(tl.getAmount());
                 bl.setNAME(tl.getName());
                 bl.setSupplierID(tl.getSupplierID());
@@ -122,9 +122,9 @@ public class OrderService {
         return sr;
     }
     public void b2cWarhouse(String product_Class) {
-        List<Record> ots = Db.find("select ptl.product_no as no ， pt.agentType , pt.sapSupplierID,pt.shipperID ,pt.saleGroup as shipperType,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
+        List<Record> ots = Db.find("select ptl.product_no as no , pt.agentType , pt.sapSupplierID,pt.shipperID ,pt.sale_group as shipperType,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
                 "where pool_task_id=pt.id and  pt.task_type='0' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
-                "GROUP BY    ptl.product_no，pt.agentType,pt.sapSupplierID ");
+                "GROUP BY    ptl.product_no,pt.agentType,pt.sapSupplierID,pt.shipperID,pt.sale_group ");
 
 
         //读取前一天的订单数据
@@ -190,7 +190,7 @@ public class OrderService {
                 if (sjkc < 0) {
                     break;
                 }
-                db = db.add(tl.getRelievePrice());
+                db = db.add(tl.getPayAmount());
                 amount = amount + tl.getAmount();
 
 
