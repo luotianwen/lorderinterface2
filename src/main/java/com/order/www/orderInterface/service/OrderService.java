@@ -124,7 +124,7 @@ public class OrderService {
     public void b2cWarhouse(String product_Class) {
         List<Record> ots = Db.find("select ptl.product_no as no ， pt.agentType , pt.sapSupplierID,pt.shipperID ,pt.saleGroup as shipperType,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
                 "where pool_task_id=pt.id and  pt.task_type='0' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
-                "GROUP BY    ptl.product_no，pt.shipperID ");
+                "GROUP BY    ptl.product_no，pt.agentType,pt.sapSupplierID ");
 
 
         //读取前一天的订单数据
@@ -132,14 +132,23 @@ public class OrderService {
         ) {
             int sjkc = 100000;//调取库存接口
             String ck = "A16";
-
-            StockReData sr=getSapStockByItemCode(r.getStr("no"));
-            if(null!=sr&&sr.getCode().equals("0")&&sr.getData().size()>0){
-                sjkc=sr.getData().get(0).getQuantity();
-                ck=sr.getData().get(0).getWharehouse();
+            //ShipperID=0  查询库存 做订单集成
+            if(r.getInt("shipperID")==0) {
+                StockReData sr = getSapStockByItemCode(r.getStr("no"));
+                if (null != sr && sr.getCode().equals("0") && sr.getData().size() > 0) {
+                    sjkc = sr.getData().get(0).getQuantity();
+                    ck = sr.getData().get(0).getWharehouse();
+                }
             }
-            else{
-                continue;
+            //ShipperID！=0 ShipperType=2  有物流单号  不查询库
+            else {
+                if (  "1".equals(r.getStr("shipperType"))) {
+                    StockReData sr = getSapStockByItemCode(r.getStr("no"));
+                    if (null != sr && sr.getCode().equals("0") && sr.getData().size() > 0) {
+                        sjkc = sr.getData().get(0).getQuantity();
+                        ck = sr.getData().get(0).getWharehouse();
+                    }
+                }
             }
             boolean save = false;
 
@@ -174,7 +183,7 @@ public class OrderService {
 
             int amount = 0;
             batch.setBatchGenDatetime(new Date());
-            List<TaskLine> tls = TaskLine.dao.getB2cTls(r.getStr("no"), product_Class);
+            List<TaskLine> tls = TaskLine.dao.getB2cTls(r.getStr("no"), product_Class,r.getStr("agentType"),r.getStr("sapSupplierID"));
             for (TaskLine tl : tls
             ) {
                 sjkc = sjkc - tl.getAmount();
