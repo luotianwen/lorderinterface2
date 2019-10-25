@@ -686,6 +686,9 @@ public class OrderService {
                 r1.set("price",r11.getBigDecimal("SUM_PRICE"));
                 r1.set("quantity",r11.getInt("AMOUNT"));
                 r1.set("omsLineId",r11.getStr("id"));
+                r1.set("agentType",r11.getStr("agentType"));
+                r1.set("sapSupplierID",r11.getStr("sapSupplierID"));
+
                 salesOrderLines.add(r1);
             }
             r.set("salesOrderLines",salesOrderLines);
@@ -738,7 +741,7 @@ public class OrderService {
                 continue;
             }
             list2.add(task);
-            List<Record> salesOrderLines1=Db.find("select  ptl.* from pool_batch_line ptl,pool_task pt  where pt.id=ptl.pool_task_id    and ptl.POOL_BATCH_ID=?",task.getStr("id"));
+            List<Record> salesOrderLines1=Db.find("select  ptl.* from pool_batch_line ptl,pool_batch pt  where pt.id=ptl.pool_task_id    and ptl.POOL_BATCH_ID=?",task.getStr("id"));
 
             Record r=new Record();
 
@@ -754,6 +757,8 @@ public class OrderService {
 
             for (Record r11:salesOrderLines1
             ) {
+                Record ar=Db.findFirst("SELECT  sum(ptlm.amount)as amount ,ptlm.userType from pool_batch pb,pool_batch_line pbl,pool_task_line ptl,pool_task_line_money ptlm where ptl.id=ptlm.line_id and pb.BATCH_NUM=ptl.batch_num and pb.id=pbl.POOL_BATCH_ID " +
+                        "ptl.agentType=? and  ptl.sAPSupplierID=? and ptl.product_no=?  GROUP BY ptlm.userType",r11.getStr("agentType") ,r11.getStr("sapSupplierID"),r11.getStr("PRODUCT_ID"));
                 Record r1=new Record();
                 r1.set("omsOrderNo",task.getStr("ERP_NO"));
                 r1.set("omsSourceNo",task.getStr("BATCH_NUM"));
@@ -764,8 +769,11 @@ public class OrderService {
                 r1.set("productType",r11.getStr("product_class"));
                 r1.set("itemCode",r11.getStr("PRODUCT_ID"));
                 r1.set("whsCode",r11.getStr("whareHouse"));
-                r1.set("price",r11.getBigDecimal("pamount"));
+                r1.set("price",ar.getBigDecimal("amount"));
                 r1.set("quantity",r11.getInt("AMOUNT"));
+                r1.set("agentType",r11.getStr("agentType"));
+                r1.set("sapSupplierID",r11.getStr("sapSupplierID"));
+
                 salesOrderLines.add(r1);
             }
             r.set("salesOrderLines",salesOrderLines);
