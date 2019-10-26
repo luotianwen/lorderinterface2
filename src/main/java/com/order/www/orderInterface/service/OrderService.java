@@ -29,7 +29,7 @@ public class OrderService {
      * 订单集合不合单，此类业务给出标识，按此标识识别订单类型
      */
     public void b2bbatch() {
-        List<Record> ots = Db.find("select DISTINCT(pt.id)as id,pt.task_type as orderclass , pt.agentType , pt.sapSupplierID  from pool_task pt,pool_task_line ptl " +
+        List<Record> ots = Db.find("select DISTINCT(pt.id)as id,pt.task_type as orderclass , pt.agentType ,pt.shipperID, pt.sapSupplierID  from pool_task pt,pool_task_line ptl " +
                 "where pool_task_id=pt.id and  pt.task_type='1'   and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY)");
 
         //List<Record> ots = Db.find("select id from pool_task where task_type='1' and  ptl.batch_num  is null and date(task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) ");
@@ -66,6 +66,7 @@ public class OrderService {
             batch.setSAPSupplierID(r.getStr("sapSupplierID"));
             //batch.setBatchCreator();
             batch.setBatchGenDatetime(new Date());
+            batch.setShipperID(r.getStr("shipperID"));
             for (TaskLine tl : tls
             ) {
 
@@ -74,7 +75,8 @@ public class OrderService {
 
                 int sjkc = 0;//调取库存接口
                 String ck = "A16";//B2B默认仓库
-                db = db.add(tl.getPayAmount());
+                 db = db.add(tl.getPayAmountSum());
+
                 String oid = UUID.randomUUID().toString().replaceAll("-", "");
                 BatchLine bl = new BatchLine();
                 bl.setAgentType(r.getStr("agentType"));
@@ -98,7 +100,7 @@ public class OrderService {
                 });
             }
             batch.setCardCode(tls.get(0).getCardCode());
-            batch.setSumAmt(db);
+             batch.setSumAmt(db);
             Db.tx(() -> {
                 batch.save();
                 return true;
@@ -126,7 +128,16 @@ public class OrderService {
                 "where pool_task_id=pt.id and  pt.task_type='0' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
                 "GROUP BY    ptl.product_no,pt.agentType,pt.sapSupplierID,pt.shipperID,pt.sale_group ");
 
-
+        Date currentTime = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+        String dateString = "JC" + formatter.format(currentTime);
+        Record rn = Db.findFirst("select BATCH_NUM as no from pool_batch where BATCH_NUM like '" + dateString + "%' order by BATCH_GEN_DATETIME desc");
+        String no1 = "";
+        if (rn != null) {
+            no1 = rn.getStr("no");
+        }
+        int newNum = 0;
+        String newStrNum = "";
         //读取前一天的订单数据
         for (Record r : ots
         ) {
@@ -154,16 +165,9 @@ public class OrderService {
 
 
             BigDecimal db = BigDecimal.ZERO;
-            Date currentTime = new Date();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-            String dateString = "JC" + formatter.format(currentTime);
-            Record rn = Db.findFirst("select BATCH_NUM as no from pool_batch where BATCH_NUM like '" + dateString + "%' order by BATCH_GEN_DATETIME desc");
-            String no1 = "";
-            if (rn != null) {
-                no1 = rn.getStr("no");
-            }
-            int newNum = 0;
-            String newStrNum = "";
+            BigDecimal db2 = BigDecimal.ZERO;
+
+
             if (StrKit.notBlank(no1)) {
                 newNum = Integer.parseInt(no1.substring(10, no1.length()));
             }
@@ -180,10 +184,11 @@ public class OrderService {
             batch.setOrderClass(r.getStr("orderclass"));
             batch.setAgentType(r.getStr("agentType"));
             batch.setSAPSupplierID(r.getStr("sapSupplierID"));
-
+            batch.setShipperID(r.getStr("shipperID"));
             int amount = 0;
             batch.setBatchGenDatetime(new Date());
             List<TaskLine> tls = TaskLine.dao.getB2cTls(r.getStr("no"), product_Class,r.getStr("agentType"),r.getStr("sapSupplierID"));
+            int amountCount=0;
             for (TaskLine tl : tls
             ) {
                 sjkc = sjkc - tl.getAmount();
@@ -191,8 +196,9 @@ public class OrderService {
                     break;
                 }
                 db = db.add(tl.getPayAmount());
+                db2 = db2.add(tl.getPayAmountSum());
                 amount = amount + tl.getAmount();
-
+                amountCount++;
 
                 String finalCk = ck;
                 Db.tx(() -> {
@@ -217,7 +223,7 @@ public class OrderService {
             bl.setId(oid);
             bl.setPoolBatchId(bid);
             bl.setProductId(tl.getProductNo());
-            bl.setSumPrice(db);
+            bl.setSumPrice(db.divide(new BigDecimal(amountCount),2,BigDecimal.ROUND_HALF_UP));
             bl.setAMOUNT(amount);
             bl.setNAME(tl.getName());
             bl.setSupplierID(tl.getSupplierID());
@@ -227,7 +233,7 @@ public class OrderService {
             bl.setAgentType(tl.getAgentType());
             bl.setSAPSupplierID(tl.getSAPSupplierID());
             batch.setCardCode(tl.getCardCode());
-            batch.setSumAmt(db);
+            batch.setSumAmt(db2);
             Db.tx(() -> {
                 bl.save();
                 batch.save();
@@ -349,7 +355,7 @@ public class OrderService {
                 ot.setAddressProvince(oe.getProName());
                 ot.setAddressCity(oe.getCityName());
                 ot.setAddressCounty(oe.getDisName());
-                ot.setFax(oe.getUserID());
+                ot.setCustomerNo(oe.getUserID());
                 ot.setPoolTaskNo(no);
                 ot.setTaskType(oe.getOrderClass() + "");
                 ot.setDmNo(oe.getActivityID() + "");
@@ -528,7 +534,7 @@ public class OrderService {
         ot.setAddressProvince(oe.getProName());
         ot.setAddressCity(oe.getCityName());
         ot.setAddressCounty(oe.getDisName());
-        ot.setFax(oe.getUserID());
+        ot.setCustomerNo(oe.getUserID());
         ot.setPoolTaskNo(no);
         ot.setTaskType(oe.getOrderClass() + "");
         ot.setDmNo(oe.getActivityID() + "");
@@ -624,7 +630,7 @@ public class OrderService {
      * 凭单接口
      */
     public void sapProfit() {
-        List<Record> tasklist = Db.find("select DISTINCT pt.id ,pt.task_no from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null");
+        List<Record> tasklist = Db.find("select DISTINCT pt.id ,pt.task_no from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where    ptlm.userType=3 and     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null");
         for (Record task : tasklist
         ) {
             List<Record> list = Db.find("select pt.task_no as platNo,pt.task_type as orderClass ,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName,  ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id  from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where  ptlm.userType=3 and    pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null and pt.id=?", task.getStr("id"));
@@ -671,6 +677,9 @@ public class OrderService {
             r.set("docDate",task.getDate("BATCH_GEN_DATETIME"));
             r.set("omsOrderNo",task.getStr("BATCH_NUM"));
             r.set("comments","");
+            r.set("shipperID",task.getStr("shipperID"));
+            r.set("agentType",task.getStr("agentType"));
+            r.set("sapSupplierID",task.getStr("sapSupplierID"));
             List<Record> salesOrderLines=new ArrayList<>();
             List<Record> salesOrderLines1=Db.find("select * from pool_batch_line where POOL_BATCH_ID=?",task.getStr("id"));
 
@@ -686,45 +695,45 @@ public class OrderService {
                 r1.set("price",r11.getBigDecimal("SUM_PRICE"));
                 r1.set("quantity",r11.getInt("AMOUNT"));
                 r1.set("omsLineId",r11.getStr("id"));
-                r1.set("agentType",r11.getStr("agentType"));
-                r1.set("sapSupplierID",r11.getStr("sapSupplierID"));
+
+
 
                 salesOrderLines.add(r1);
             }
             r.set("salesOrderLines",salesOrderLines);
-            list.add(r);
-            break;
-        }
-        String param= JsonKit.toJson(list);
-        String json = OrderStatic.post(OrderStatic.salesorder,param);
-        log.info("销售订单接口参数"+param);
-        ResponseEntity responseEntity = JSON.parseObject(json, ResponseEntity.class);
-        log.info("销售订单接口结果"+JsonKit.toJson(responseEntity));
+            String param= JsonKit.toJson(r);
+            String json = OrderStatic.post(OrderStatic.salesorder,param);
+            System.out.println(json);
+            log.info("销售订单接口参数"+param);
+            ResponseEntity responseEntity = JSON.parseObject(json, ResponseEntity.class);
+            log.info("销售订单接口结果"+JsonKit.toJson(responseEntity));
+            System.out.println(JsonKit.toJson(responseEntity));
+            if (responseEntity.getCode() == 0) {
+                try {
+                    Db.tx(() -> {
+                        for (Record r1 : tasklist
+                                ) {
+                            String no =  UUID.randomUUID().toString().replaceAll("-", "");;
+                            Db.update("update pool_batch set ERP_NO=? where id=?", no, r1.getStr("id"));
+                            Db.update("update  pool_task_line   set  erp_no=? where  batch_num=?", no, r1.getStr("BATCH_NUM"));
+                        }
 
-        if (responseEntity.getCode() == 0) {
-            try {
-                Db.tx(() -> {
-                    for (Record r : tasklist
-                    ) {
-                        String no =  UUID.randomUUID().toString().replaceAll("-", "");;
-                        Db.update("update pool_batch set ERP_NO=? where id=?", no, r.getStr("id"));
-                        Db.update("update  pool_task_line   set  erp_no=? where  batch_num=?", no, r.getStr("BATCH_NUM"));
-                    }
+                        return true;
+                    });
 
-                    return true;
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                log.error(e.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.error(e.getMessage());
+                    log.error("销售订单接口参数"+param);
+                    log.error("销售订单接口结果"+JsonKit.toJson(responseEntity));
+                }
+            }
+            else{
                 log.error("销售订单接口参数"+param);
                 log.error("销售订单接口结果"+JsonKit.toJson(responseEntity));
             }
         }
-        else{
-            log.error("销售订单接口参数"+param);
-            log.error("销售订单接口结果"+JsonKit.toJson(responseEntity));
-        }
+
     }
     /*
     销售交货接口
@@ -741,7 +750,7 @@ public class OrderService {
                 continue;
             }
             list2.add(task);
-            List<Record> salesOrderLines1=Db.find("select  ptl.* from pool_batch_line ptl,pool_batch pt  where pt.id=ptl.pool_task_id    and ptl.POOL_BATCH_ID=?",task.getStr("id"));
+            List<Record> salesOrderLines1=Db.find("select  ptl.* from pool_batch_line ptl,pool_batch pt  where pt.id=ptl.POOL_BATCH_ID    and ptl.POOL_BATCH_ID=?",task.getStr("id"));
 
             Record r=new Record();
 
@@ -751,14 +760,16 @@ public class OrderService {
             r.set("omsOrderNo",task.getStr("ERP_NO"));
             r.set("omsSourceNo",task.getStr("BATCH_NUM"));
             r.set("comments","");
-
+            r.set("shipperID",task.getStr("shipperID"));
+            r.set("agentType",task.getStr("agentType"));
+            r.set("sapSupplierID",task.getStr("sapSupplierID"));
 
             List<Record> salesOrderLines=new ArrayList<>();
 
             for (Record r11:salesOrderLines1
             ) {
-                Record ar=Db.findFirst("SELECT  sum(ptlm.amount)as amount ,ptlm.userType from pool_batch pb,pool_batch_line pbl,pool_task_line ptl,pool_task_line_money ptlm where ptl.id=ptlm.line_id and pb.BATCH_NUM=ptl.batch_num and pb.id=pbl.POOL_BATCH_ID " +
-                        "ptl.agentType=? and  ptl.sAPSupplierID=? and ptl.product_no=?  GROUP BY ptlm.userType",r11.getStr("agentType") ,r11.getStr("sapSupplierID"),r11.getStr("PRODUCT_ID"));
+                Record ar=Db.findFirst("SELECT  sum(ptlm.amount)as amount   from pool_batch pb,pool_batch_line pbl,pool_task_line ptl,pool_task_line_money ptlm where ptl.id=ptlm.line_id and pb.BATCH_NUM=ptl.batch_num and pb.id=pbl.POOL_BATCH_ID " +
+                        "and ptl.agentType=? and  ptl.sAPSupplierID=? and ptl.product_no=?  and ptlm.userType=2",r11.getStr("agentType") ,r11.getStr("sapSupplierID"),r11.getStr("PRODUCT_ID"));
                 Record r1=new Record();
                 r1.set("omsOrderNo",task.getStr("ERP_NO"));
                 r1.set("omsSourceNo",task.getStr("BATCH_NUM"));
@@ -769,45 +780,44 @@ public class OrderService {
                 r1.set("productType",r11.getStr("product_class"));
                 r1.set("itemCode",r11.getStr("PRODUCT_ID"));
                 r1.set("whsCode",r11.getStr("whareHouse"));
-                r1.set("price",ar.getBigDecimal("amount"));
+                r1.set("price",ar.getDouble("amount"));//交货 2 供应商
                 r1.set("quantity",r11.getInt("AMOUNT"));
-                r1.set("agentType",r11.getStr("agentType"));
-                r1.set("sapSupplierID",r11.getStr("sapSupplierID"));
+
 
                 salesOrderLines.add(r1);
             }
-            r.set("salesOrderLines",salesOrderLines);
-            list.add(r);
-        }
-        String param=JsonKit.toJson(list);
-        String json = OrderStatic.post(OrderStatic.salesdelivery,param );
-        log.info("销售交货接口参数"+param);
-        ResponseEntity responseEntity = JSON.parseObject(json, ResponseEntity.class);
-        log.info("销售交货接口结果"+JsonKit.toJson(responseEntity));
+            r.set("salesDeliveryLines",salesOrderLines);
+            String param=JsonKit.toJson(r);
+            String json = OrderStatic.post(OrderStatic.salesdelivery,param );
+            log.info("销售交货接口参数"+param);
+            ResponseEntity responseEntity = JSON.parseObject(json, ResponseEntity.class);
+            log.info("销售交货接口结果"+JsonKit.toJson(responseEntity));
 
-        if (responseEntity.getCode() == 0) {
-            try {
-                Db.tx(() -> {
-                     for (Record r : list2
-                    ) {
+            if (responseEntity.getCode() == 0) {
+                try {
+                    Db.tx(() -> {
+                        for (Record r1 : list2
+                                ) {
 
-                        Db.update("update pool_batch set isok=? where id=?", "1", r.getStr("id"));
-                    }
+                            Db.update("update pool_batch set isok=? where id=?", "1", r1.getStr("id"));
+                        }
 
-                    return true;
-                });
+                        return true;
+                    });
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                log.error(e.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.error(e.getMessage());
+                    log.error("销售交货接口参数"+param);
+                    log.error("销售交货接口结果"+JsonKit.toJson(responseEntity));
+                }
+            }
+            else{
                 log.error("销售交货接口参数"+param);
                 log.error("销售交货接口结果"+JsonKit.toJson(responseEntity));
             }
         }
-        else{
-            log.error("销售交货接口参数"+param);
-            log.error("销售交货接口结果"+JsonKit.toJson(responseEntity));
-        }
+
 
     }
 }

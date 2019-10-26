@@ -1,14 +1,12 @@
-cron4j=getorder,batch,deliver,b2c
+cron4j=getorder,batch,deliver,b2c, sapdeli
 getorder.cron=04 00 * * *
 getorder.class=com.order.www.orderInterface.task.OrderCronTask
 getorder.daemon=true
 getorder.enable=true
-
 batch.cron=04 01 * * *
 batch.class=com.order.www.orderInterface.task.OrderB2BBatchTask
 batch.daemon=true
 batch.enable=true
-
 b2c.cron=04 02 * * *
 b2c.class=com.order.www.orderInterface.task.OrderB2CBatchTask
 b2c.daemon=true
@@ -18,3 +16,8 @@ deliver.cron=00 23 * * *
 deliver.class=com.order.www.orderInterface.task.OrderDeliverTask
 deliver.daemon=true
 deliver.enable=true
+
+sapdeli.cron=30 02 * * *
+sapdeli.class=com.order.www.orderInterface.task.SapTask
+sapdeli.daemon=true
+sapdeli.enable=true

@@ -8,7 +8,13 @@ import com.jfinal.plugin.activerecord.IBean;
  */
 @SuppressWarnings("serial")
 public abstract class BaseBatch<M extends BaseBatch<M>> extends Model<M> implements IBean {
+	public void setShipperID(java.lang.String id) {
+		set("shipperID", id);
+	}
 
+	public java.lang.String getShipperID() {
+		return getStr("shipperID");
+	}
 	public void setAgentType(java.lang.String id) {
 		set("agentType", id);
 	}
