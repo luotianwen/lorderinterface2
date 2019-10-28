@@ -278,7 +278,7 @@ public class OrderService {
         oj.setCreateDate(new Date());
         oj.setId(UUID.randomUUID().toString().replaceAll("-", ""));
         oj.save();
-        System.out.println(json);
+       // System.out.println(json);
         log.info(json);
         ResponseEntity<OrderBean> datas = JSON.parseObject(json, new TypeReference<ResponseEntity<OrderBean>>(ResponseEntity.class, OrderBean.class, OrderEntity.class) {
         });

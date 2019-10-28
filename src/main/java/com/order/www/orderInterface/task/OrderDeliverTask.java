@@ -14,7 +14,8 @@ public class OrderDeliverTask implements Runnable{
 
     @Override
     public void run() {
-        log.info("发货开始");
+        log.info("OrderDeliverTask 开始");
         orderService.orderDeliver();
+        log.info("OrderDeliverTask 结束");
     }
 }
