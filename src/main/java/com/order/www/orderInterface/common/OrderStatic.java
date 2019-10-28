@@ -145,7 +145,7 @@ public class OrderStatic {
         String keys=PropKit.get("lxd.Key");
         String key=r+" "+ md5(md5(keys).toUpperCase()+r).toUpperCase();
         headers.put("Authorization",key);
-        System.out.println(headers.toString());
+       // System.out.println(headers.toString());
         return post(url,params,headers);
     }
 
@@ -161,6 +161,7 @@ public class OrderStatic {
         Set<String> keys = headers.keySet();
         for (String key : keys) {
             httppost.setHeader(key, headers.get(key).toString());
+           // System.out.println(key+"="+ headers.get(key).toString());
         }
         // 创建参数队列
         List<BasicNameValuePair> formparams = new ArrayList<BasicNameValuePair>();
@@ -168,6 +169,7 @@ public class OrderStatic {
         while (it.hasNext()) {
             Object key = it.next();
             formparams.add(new BasicNameValuePair(key.toString(), params.get(key.toString())));
+           // System.out.println(key.toString()+"="+params.get(key.toString()));
         }
 
 

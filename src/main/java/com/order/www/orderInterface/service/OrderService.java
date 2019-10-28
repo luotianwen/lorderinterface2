@@ -41,7 +41,7 @@ public class OrderService {
             Date currentTime = new Date();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
             String dateString = "JC" + formatter.format(currentTime);
-            Record rn = Db.findFirst("select BATCH_NUM as no from pool_batch where BATCH_NUM like '" + dateString + "%' order by BATCH_GEN_DATETIME desc");
+            Record rn = Db.findFirst("select BATCH_NUM as no from pool_batch where BATCH_NUM like '" + dateString + "%' order by BATCH_NUM desc");
             String no1 = "";
             if (rn != null) {
                 no1 = rn.getStr("no");
@@ -56,6 +56,7 @@ public class OrderService {
             //数字长度为5位，长度不够数字前面补0
             newStrNum = String.format("%05d", newNum);
             no1 = dateString + newStrNum;
+            System.out.println("b2bbatch-------"+no1);
             String no = no1;
             String bid = UUID.randomUUID().toString().replaceAll("-", "");
             Batch batch = new Batch();
@@ -106,6 +107,14 @@ public class OrderService {
                 return true;
             });
         }
+        try {
+            Thread.sleep(3000L);
+            b2cMainbatch();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     /**
@@ -113,7 +122,8 @@ public class OrderService {
      * 客户通过账号余额、微信等第三方支付平台完成支付，第三方支付通过T+1的时间周期，打款给平台，平台确认发货后完成分润，但不打款，待客户收到货后执行分润金额打款。
      */
     public void b2cMainbatch() {
-        b2cWarhouse("1");
+         b2cWarhouse("1");
+
     }
 
 
@@ -124,14 +134,16 @@ public class OrderService {
         return sr;
     }
     public void b2cWarhouse(String product_Class) {
+
         List<Record> ots = Db.find("select ptl.product_no as no , pt.agentType , pt.sapSupplierID,pt.shipperID ,pt.sale_group as shipperType,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
                 "where pool_task_id=pt.id and  pt.task_type='0' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
                 "GROUP BY    ptl.product_no,pt.agentType,pt.sapSupplierID,pt.shipperID,pt.sale_group ");
 
         Date currentTime = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-        String dateString = "JC" + formatter.format(currentTime);
-        Record rn = Db.findFirst("select BATCH_NUM as no from pool_batch where BATCH_NUM like '" + dateString + "%' order by BATCH_GEN_DATETIME desc");
+        String dateString = "JC"+ formatter.format(currentTime);
+        Record rn = Db.findFirst("select BATCH_NUM as no from pool_batch where BATCH_NUM like '" + dateString + "%' order by BATCH_NUM desc");
+        System.out.println(rn.toJson());
         String no1 = "";
         if (rn != null) {
             no1 = rn.getStr("no");
@@ -173,9 +185,11 @@ public class OrderService {
             }
 
             newNum++;
+
             //数字长度为5位，长度不够数字前面补0
             newStrNum = String.format("%05d", newNum);
             no1 = dateString + newStrNum;
+
             String no = no1;
             String bid = UUID.randomUUID().toString().replaceAll("-", "");
             Batch batch = new Batch();
@@ -193,6 +207,10 @@ public class OrderService {
             ) {
                 sjkc = sjkc - tl.getAmount();
                 if (sjkc < 0) {
+                    Db.tx(() -> {
+                        Db.update("update pool_task  set haveAmount=null where id=?", tl.getPoolTaskId());
+                        return true;
+                    });
                     break;
                 }
                 db = db.add(tl.getPayAmount());
@@ -234,14 +252,27 @@ public class OrderService {
             bl.setSAPSupplierID(tl.getSAPSupplierID());
             batch.setCardCode(tl.getCardCode());
             batch.setSumAmt(db2);
+
             Db.tx(() -> {
                 bl.save();
                 batch.save();
+
                 return true;
             });
 
 
         }
+
+        try {
+            Thread.sleep(1000L);
+
+            if(product_Class.equals("1")) {
+                b2cGiftbatch();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -250,6 +281,8 @@ public class OrderService {
      */
     public void b2cGiftbatch() {
         b2cWarhouse("2");
+
+
 
     }
 
@@ -447,21 +480,28 @@ public class OrderService {
         for (OrderTask ot : ots) {
             map.clear();
             String[] cs = ot.getCarriers().split("\\s+");
-            String LogisticsNum = "";
+            String LogisticsCode = "";
+
             for (Record es : ess) {
                 if (es.getStr("name").contains(cs[0])) {
-                    LogisticsNum = es.getStr("remarks");
+                    LogisticsCode = es.getStr("remarks");
+
                     break;
                 }
+
+
             }
-            if (StrKit.isBlank(LogisticsNum)) {
+            if (StrKit.isBlank(LogisticsCode)) {
                 continue;
             }
             map.put("OrderID", ot.getTaskNo());
-            map.put("LogisticsNum", LogisticsNum);
-            map.put("LogisticsCode", cs[1]);
+            map.put("LogisticsNum", cs[1]);
+            map.put("LogisticsCode", LogisticsCode);
+
+            log.info("发送发货" +map.toString());
             String json = OrderStatic.lxdpost(OrderStatic.SendGoods, map);
-            log.info("发送发货" + ot.getTaskNo() + "   " + json);
+            log.info("发送发货" +  ot.getTaskNo() + "   " + json);
+            System.out.println(json);
 
         }
     }

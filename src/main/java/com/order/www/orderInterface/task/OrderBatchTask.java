@@ -15,12 +15,9 @@ public class OrderBatchTask implements Runnable {
     static OrderService orderService = Aop.get(OrderService.class);
     @Override
     public void run() {
-        log.info("OrderB2BBatchTask  begin");
+        log.info("OrderBatchTask  begin");
         orderService.b2bbatch();
-        log.info("OrderB2BBatchTask end");
-        log.info("OrderB2CBatchTask  begin");
-        orderService.b2cMainbatch();
-        orderService.b2cGiftbatch();
-        log.info("OrderB2CBatchTask end");
+        log.info("OrderBatchTask end");
+
     }
 }
