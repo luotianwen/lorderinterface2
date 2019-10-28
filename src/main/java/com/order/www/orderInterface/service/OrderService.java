@@ -496,6 +496,7 @@ public class OrderService {
         List<TaskLine> tks = new ArrayList<>();
         for (OrderEntity.ItemsBean it : obs
         ) {
+
             String id = UUID.randomUUID().toString().replaceAll("-", "");
             TaskLine tk = new TaskLine();
             tk.setPoolTaskId(oid);
@@ -505,11 +506,10 @@ public class OrderService {
             tk.setAmount(it.getQuanTity());
             tk.setName(it.getProductName());
             tk.setLxbAmount(new BigDecimal(it.getScore()));
-            tk.setRelievePrice(new BigDecimal(it.getPrice()));
+            //tk.setRelievePrice(new BigDecimal(it.getPayAmountSum()));
             tk.setSupplierID(it.getSupplierID());
             tk.setSupplierName(it.getSupplierName());
             tk.setProductClass(it.getProductType() + "");
-
             tk.setPayAmount(new BigDecimal(it.getPayAmount()));
             tk.setPayAmountSum(new BigDecimal(it.getPayAmountSum()));
             tk.setSAPSupplierID(it.getSapSupplierID());
@@ -517,13 +517,12 @@ public class OrderService {
             tk.setReductionAmount(new BigDecimal(it.getReductionAmount()));
             tk.setAgentType(it.getAgentType());
             tk.setScore(new BigDecimal(it.getScore()));
-
             tks.add(tk);
 
         }
-
         OrderTask ot = new OrderTask();
         ot.setTaskAmount(new BigDecimal(oe.getPayAmount()));
+        ot.setCardCode(oe.getCardCode());
         ot.setId(oid);
         ot.setTaskStatus(1);
         ot.setTaskNo(oe.getOrderID());
@@ -542,14 +541,15 @@ public class OrderService {
         ot.setTaskCreator(oe.getCreateUserName());
         ot.setRemark(oe.getRemark());
         ot.setCreateDate(new Date());
+        ot.setSaleGroup(oe.getShipperType() + "");
         ot.setShipperName(oe.getShipperName());
         ot.setShipperID(oe.getShipperID() + "");
-
         ot.setPayableAmount(new BigDecimal(oe.getPayableAmount()));
         ot.setReductionAmount(new BigDecimal(oe.getReductionAmount()));
         ot.setScore(new BigDecimal(oe.getScore()));
         ot.setAgentType(oe.getAgentType());
         ot.setSAPSupplierID(oe.getSapSupplierID());
+
 
 
         for (TaskLine t : tks
