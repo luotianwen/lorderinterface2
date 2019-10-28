@@ -501,7 +501,9 @@ public class OrderService {
             log.info("发送发货" +map.toString());
             String json = OrderStatic.lxdpost(OrderStatic.SendGoods, map);
             log.info("发送发货" +  ot.getTaskNo() + "   " + json);
-            System.out.println(json);
+
+            SendsGoodsData orderReturns=JSON.parseObject(json, SendsGoodsData.class);
+             GetTransfer(orderReturns.getResult());
 
         }
     }

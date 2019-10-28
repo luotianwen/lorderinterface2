@@ -43,9 +43,10 @@ public class Test {
             e.printStackTrace();
         }*/
          //journal();
-        salesorder();
+        //salesorder();
         //salesdelivery();
         //stock();
+
     }
     public static void  stock(){
         String url=sap+"v1/stock";

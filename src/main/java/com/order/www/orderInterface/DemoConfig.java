@@ -44,11 +44,11 @@ public class DemoConfig extends JFinalConfig {
 		  //new SapOrderTask().run();
 		//new SapTask().run();
 		 //new SapProfitTask().run();
-     /*   String result="[{\"OrderID\":\"LD201910181422572826938\",\"Amount\":0.0,\"AmountType\":1,\"OrderDate\":\"2019-10-18T14:22:57\",\"ProductName\":\"佛初草三瓶装\",\"ProductNumber\":10,\"ItemCode\":\"800766\",\"CreateTime\":\"2019-10-18T14:25:50\",\"Item\":[{\"UserType\":0,\"TypeName\":\"门店分账\",\"Amount\":0.00,\"Proportion\":0.00},{\"UserType\":1,\"TypeName\":\"代理商分账\",\"Amount\":10940.00,\"Proportion\":0.60},{\"UserType\":2,\"TypeName\":\"供应商分账\",\"Amount\":7562.00,\"Proportion\":0.38},{\"UserType\":3,\"TypeName\":\"平台分账\",\"Amount\":199.00,\"Proportion\":0.01}]}]";
-		List<TransferData> orderReturns= JSON.parseArray(result, TransferData.class);
+       /* String result=" {\"Status\":200,\"Result\":[{\"OrderID\":\"LD201910281623031354397\",\"Amount\":3380.0,\"OrderDate\":\"2019/10/28 16:23:03\",\"ProductName\":\"新版净牌-雪莲滋养贴200片\",\"ProductNumber\":1,\"ItemCode\":\"888890-01\",\"CreateTime\":\"2019-10-28 16:23:23\",\"AmountType\":1,\"Item\":[{\"UserType\":5,\"TypeName\":\"魅力合伙人分账\",\"Amount\":338.00,\"Proportion\":0.10},{\"UserType\":0,\"TypeName\":\"门店分账\",\"Amount\":1318.20,\"Proportion\":0.39},{\"UserType\":1,\"TypeName\":\"代理商分账\",\"Amount\":507.00,\"Proportion\":0.15},{\"UserType\":2,\"TypeName\":\"供应商分账\",\"Amount\":338.00,\"Proportion\":0.10},{\"UserType\":3,\"TypeName\":\"平台分账\",\"Amount\":0.00,\"Proportion\":0.00}]}],\"Msg\":\"成功\"}";
+		SendsGoodsData orderReturns=JSON.parseObject(result, SendsGoodsData.class);
 		//TransferData orderReturn= JSON.parseObject(result, TransferData.class);
 		  OrderService orderService = Aop.get(OrderService.class);
-		orderService.GetTransfer(orderReturns);*/
+		orderService.GetTransfer(orderReturns.getResult());*/
 	}
 
 	/**
