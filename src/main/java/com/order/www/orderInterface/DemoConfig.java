@@ -39,7 +39,7 @@ public class DemoConfig extends JFinalConfig {
 		 // new OrderCronTask().run();
 		  //new OrderBatchTask().run();
 		 // new OrderB2BBatchTask().run();
-		 // new OrderDeliverTask().run();
+		  //new OrderDeliverTask().run();
 		 //new SapDeliveryTask().run();
 		  //new SapOrderTask().run();
 		//new SapTask().run();

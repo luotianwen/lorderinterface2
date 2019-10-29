@@ -435,7 +435,7 @@ public class OrderService {
         for (TransferData transferData : orderReturns
         ) {
             List<TransferData.ItemBean> ibs = transferData.getItem();
-            TaskLine tl = TaskLine.dao.findFirst("select id from pool_task_line where task_no=? and product_no=?", transferData.getOrderID(), transferData.getItemCode());
+            TaskLine tl = TaskLine.dao.findFirst("select id from pool_task_line where  product_class in('1','3','5') and task_no=? and product_no=?", transferData.getOrderID(), transferData.getItemCode());
             if (null == tl) {
                 continue;
             }
@@ -810,7 +810,7 @@ public class OrderService {
 
             for (Record r11:salesOrderLines1
             ) {
-                Record ar=Db.findFirst("SELECT  sum(ptlm.amount)as amount   from pool_batch pb,pool_batch_line pbl,pool_task_line ptl,pool_task_line_money ptlm where ptl.id=ptlm.line_id and pb.BATCH_NUM=ptl.batch_num and pb.id=pbl.POOL_BATCH_ID " +
+                Record ar=Db.findFirst("SELECT  IFNULL(sum(ptlm.amount),0)as amount   from pool_batch pb,pool_batch_line pbl,pool_task_line ptl,pool_task_line_money ptlm where ptl.id=ptlm.line_id and pb.BATCH_NUM=ptl.batch_num and pb.id=pbl.POOL_BATCH_ID " +
                         "and ptl.agentType=? and  ptl.sAPSupplierID=? and ptl.product_no=?  and ptlm.userType=2",r11.getStr("agentType") ,r11.getStr("sapSupplierID"),r11.getStr("PRODUCT_ID"));
                 Record r1=new Record();
                 r1.set("omsOrderNo",task.getStr("ERP_NO"));
