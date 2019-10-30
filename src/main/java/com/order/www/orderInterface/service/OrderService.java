@@ -56,7 +56,7 @@ public class OrderService {
             //数字长度为5位，长度不够数字前面补0
             newStrNum = String.format("%05d", newNum);
             no1 = dateString + newStrNum;
-            System.out.println("b2bbatch-------"+no1);
+            //System.out.println("b2bbatch-------"+no1);
             String no = no1;
             String bid = UUID.randomUUID().toString().replaceAll("-", "");
             Batch batch = new Batch();
@@ -143,9 +143,10 @@ public class OrderService {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
         String dateString = "JC"+ formatter.format(currentTime);
         Record rn = Db.findFirst("select BATCH_NUM as no from pool_batch where BATCH_NUM like '" + dateString + "%' order by BATCH_NUM desc");
-        System.out.println(rn.toJson());
+
         String no1 = "";
         if (rn != null) {
+           // System.out.println(rn.toJson());
             no1 = rn.getStr("no");
         }
         int newNum = 0;
@@ -745,11 +746,11 @@ public class OrderService {
             r.set("salesOrderLines",salesOrderLines);
             String param= JsonKit.toJson(r);
             String json = OrderStatic.post(OrderStatic.salesorder,param);
-            System.out.println(json);
+            //System.out.println(json);
             log.info("销售订单接口参数"+param);
             ResponseEntity responseEntity = JSON.parseObject(json, ResponseEntity.class);
             log.info("销售订单接口结果"+JsonKit.toJson(responseEntity));
-            System.out.println(JsonKit.toJson(responseEntity));
+           // System.out.println(JsonKit.toJson(responseEntity));
             if (responseEntity.getCode() == 0) {
                 try {
                     Db.tx(() -> {
