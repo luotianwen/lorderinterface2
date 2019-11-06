@@ -13,7 +13,7 @@ public class SapTask  implements Runnable {
         orderService.sapOrder();
         orderService.sapProfit();
         orderService.sapDelivery();
-        log.info("SapTask  begin");
+        log.info("SapTask  end");
     }
 }
 

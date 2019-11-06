@@ -793,7 +793,7 @@ public class OrderService {
                 continue;
             }
             list2.add(task);
-            List<Record> salesOrderLines1=Db.find("select  ptl.* from pool_batch_line ptl,pool_batch pt  where pt.id=ptl.POOL_BATCH_ID    and ptl.POOL_BATCH_ID=?",task.getStr("id"));
+            List<Record> salesOrderLines1=Db.find("select  ptl.*,pt.BATCH_NUM as batch_num from pool_batch_line ptl,pool_batch pt  where pt.id=ptl.POOL_BATCH_ID    and ptl.POOL_BATCH_ID=?",task.getStr("id"));
 
             Record r=new Record();
 
@@ -811,9 +811,24 @@ public class OrderService {
 
             for (Record r11:salesOrderLines1
             ) {
-                Record ar=Db.findFirst("SELECT  IFNULL(sum(ptlm.amount),0)as amount   from pool_batch pb,pool_batch_line pbl,pool_task_line ptl,pool_task_line_money ptlm where ptl.id=ptlm.line_id and pb.BATCH_NUM=ptl.batch_num and pb.id=pbl.POOL_BATCH_ID " +
-                        "and ptl.agentType=? and  ptl.sAPSupplierID=? and ptl.product_no=?  and ptlm.userType=2",r11.getStr("agentType") ,r11.getStr("sapSupplierID"),r11.getStr("PRODUCT_ID"));
-                Record r1=new Record();
+
+                 List<Record> ass=Db.find("SELECT    ptl.id  from pool_task_line ptl where   ptl.agentType=? and  ptl.sAPSupplierID=? and ptl.product_no=?   and  ptl.batch_num =?",r11.getStr("agentType") ,r11.getStr("sapSupplierID"),r11.getStr("PRODUCT_ID"),r11.getStr("batch_num"));
+                log.info("交货参数2"+(null==ass?"":ass.toString()));
+                //BigDecimal a=new BigDecimal(0);
+                float a=0;
+                 if(null!=ass){
+                     for (Record as:ass ) {
+                         Record ar = Db.findFirst("select  IFNULL(ptlm.amount,0)as amount  from     pool_task_line_money  ptlm where    ptlm.userType=2 and      ptlm.line_id=?", as.getStr("id"));
+                         log.info("交货参数" + (null == ar ? "" : ar.toString()));
+                         if (null != ar) {
+                             a=a+ar.getFloat("amount");
+                            // a=a.add(ar.getBigDecimal("amount"));
+                             //a = ar.getDouble("amount");
+                         }
+                     }
+                }
+
+            Record r1=new Record();
                 r1.set("omsOrderNo",task.getStr("ERP_NO"));
                 r1.set("omsSourceNo",task.getStr("BATCH_NUM"));
                 r1.set("costingCode1","");
@@ -823,7 +838,7 @@ public class OrderService {
                 r1.set("productType",r11.getStr("product_class"));
                 r1.set("itemCode",r11.getStr("PRODUCT_ID"));
                 r1.set("whsCode",r11.getStr("whareHouse"));
-                r1.set("price",ar.getDouble("amount"));//交货 2 供应商
+                r1.set("price",a);//交货 2 供应商
                 r1.set("quantity",r11.getInt("AMOUNT"));
 
 
