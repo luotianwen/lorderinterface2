@@ -676,7 +676,7 @@ public class OrderService {
         List<Record> tasklist = Db.find("select DISTINCT pt.id ,pt.task_no from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where    ptlm.userType=3 and     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null");
         for (Record task : tasklist
         ) {
-            List<Record> list = Db.find("select pt.task_no as platNo,pt.task_type as orderClass ,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName,  ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id  from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where  ptlm.userType=3 and    pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null and pt.id=?", task.getStr("id"));
+            List<Record> list = Db.find("select pt.task_no as platNo,pt.task_type as orderClass ,ptl.product_class as productType,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName,  ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id  from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where  ptlm.userType=3 and    pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null and pt.id=?", task.getStr("id"));
             String param=JsonKit.toJson(list);
             String json = OrderStatic.post(OrderStatic.journal,param);
             log.info("凭单接口参数"+param);
