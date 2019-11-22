@@ -11,6 +11,6 @@ public class OrderTask extends BaseOrderTask<OrderTask> {
     public static final OrderTask dao = new OrderTask().dao();
     //获取当天发货的订单
     public List<OrderTask> getCurDeliverOrder(){
-        return this.find("select  task_no,carriers from pool_task where date(send_store_datetime)=date(now()) and carriers is not null");
+        return this.find("select  task_no,carriers from pool_task where date(send_store_datetime)=date(now()) and isThree=0  and carriers is not null");
     }
 }

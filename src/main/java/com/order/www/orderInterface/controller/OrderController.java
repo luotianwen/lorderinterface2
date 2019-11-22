@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.jfinal.aop.Inject;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.Ret;
+import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
 import com.order.www.orderInterface.entity.*;
 import com.order.www.orderInterface.service.OrderService;
@@ -182,6 +183,36 @@ public class OrderController extends Controller {
 			renderJson(Ret.fail());
 		}
 
+	}
+	@ApiOperation(tags="订单发货", methods={RequestMethod.GET,RequestMethod.POST},produces = "application/json",description ="订单发货" )
+	@ApiParams({
+			@ApiParam(required=true, description="  订单号",name = "OrderID"),
+			@ApiParam(required =true,description = " 物流单号",name = "LogisticsNum"),
+			@ApiParam(required =true,description = " 物流公司编码",name = "LogisticsCode")
+	}
+	)
+
+	@ApiResponses({
+			@ApiResponse(code ="state",message = "状态 ok 为成功 其他为 失败")
+
+	})
+	public void SendGoods(){
+		String orderID=getPara("OrderID");
+		String LogisticsNum=getPara("LogisticsNum");
+		String LogisticsCode=getPara("LogisticsCode");
+		log.info("订单发货orderID:"+orderID+"单号:"+LogisticsNum+"编码:"+LogisticsCode);
+		if(StrKit.isBlank(orderID)||StrKit.isBlank(LogisticsCode)||StrKit.isBlank(LogisticsNum)){
+			renderJson(Ret.fail());
+		}
+		else {
+			try {
+				orderService.sendGoods(orderID, LogisticsNum, LogisticsCode);
+				renderJson(Ret.ok());
+			} catch (Exception e) {
+				log.error(e.getMessage());
+				renderJson(Ret.fail());
+			}
+		}
 	}
 	@ApiOperation(tags="订单状态改变", methods={RequestMethod.GET,RequestMethod.POST},produces = "application/json",description ="订单状态改变信息接口" )
 	@ApiParams({

@@ -878,4 +878,14 @@ public class OrderService {
 
 
     }
+    @Before(Tx.class)
+    public void sendGoods(String orderID, String logisticsNum, String logisticsCode) throws Exception {
+        String carriers;
+        Record r=Db.findFirst("select name from pool_express where remarks =?" ,logisticsCode);
+        if(null==r||StrKit.isBlank(r.getStr("name"))){
+           throw new Exception("单号填写出错");
+        }
+        carriers=r.getStr("name")+" "+logisticsNum;
+        Db.update("UPDATE pool_task SET carriers =?, send_way =2, task_status='3', isThree=1, send_store_datetime = now() where task_no=?",carriers,orderID);
+    }
 }
