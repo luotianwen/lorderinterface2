@@ -2,14 +2,18 @@ package com.order.www.orderInterface.controller;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.jfinal.aop.Inject;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
-import com.order.www.orderInterface.entity.*;
+import com.order.www.orderInterface.entity.GetMoney;
+import com.order.www.orderInterface.entity.OrderEntity;
+import com.order.www.orderInterface.entity.TransferData;
 import com.order.www.orderInterface.service.OrderService;
 import top.hequehua.swagger.annotation.*;
+import top.hequehua.swagger.config.DataType;
 import top.hequehua.swagger.config.RequestMethod;
 
 import java.util.List;
@@ -178,6 +182,49 @@ public class OrderController extends Controller {
 			GetMoney money=JSON.parseObject(result, GetMoney.class);
 			orderService.getMoney(money);
 			renderJson(Ret.ok());
+		}catch (Exception e){
+			log.error(e.getMessage());
+			renderJson(Ret.fail());
+		}
+
+	}
+	@ApiOperation(tags="批量发货", methods={RequestMethod.GET,RequestMethod.POST},produces = "application/json",description ="批量发货接口信息" )
+	@ApiParams({
+			@ApiParam(required=true, dataType= DataType.APPLICATION_JSON,paramType="raw", description="[{\"OrderID\":\"LD201904221639537911111\",\"LogisticsNum\":\"物流单号\",\"LogisticsCode\":\"物流公司编码\" } ]" )
+	})
+	@ApiResponses({
+			@ApiResponse(code ="state",message = "状态 ok 为成功 其他为 失败",response = Ret.class)
+
+	})
+	public void SendALLGoods(){
+		String result=getRawData();
+
+		log.info("批量发货参数"+result);
+		try {
+			JSONArray ja=JSON.parseArray(result);
+			boolean va=false;
+			for(int i=0;i<ja.size();i++) {
+				String orderID=ja.getJSONObject(i).getString("OrderID");
+				String LogisticsNum=ja.getJSONObject(i).getString("LogisticsNum");
+				String LogisticsCode=ja.getJSONObject(i).getString("LogisticsCode");
+				if(StrKit.isBlank(orderID)||StrKit.isBlank(LogisticsCode)||StrKit.isBlank(LogisticsNum)){
+					va=true;
+				}
+			}
+			if(!va) {
+				for (int i = 0; i < ja.size(); i++) {
+					String orderID=ja.getJSONObject(i).getString("OrderID");
+					String LogisticsNum=ja.getJSONObject(i).getString("LogisticsNum");
+					String LogisticsCode=ja.getJSONObject(i).getString("LogisticsCode");
+					orderService.sendGoods(orderID, LogisticsNum, LogisticsCode);
+				}
+				renderJson(Ret.ok());
+			}
+			else{
+				renderJson(Ret.fail());
+			}
+
+
 		}catch (Exception e){
 			log.error(e.getMessage());
 			renderJson(Ret.fail());
