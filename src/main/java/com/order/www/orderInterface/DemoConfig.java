@@ -39,10 +39,10 @@ public class DemoConfig extends JFinalConfig {
 		 // new OrderCronTask().run();
 		  //new OrderBatchTask().run();
 		 // new OrderB2BBatchTask().run();
-		  //new OrderDeliverTask().run();
+		   // new OrderDeliverTask().run();
 		 //new SapDeliveryTask().run();
 		  //new SapOrderTask().run();
-		 //new SapTask().run();
+		  // new SapTask().run();
 		 //new SapProfitTask().run();
        /* String result=" {\"Status\":200,\"Result\":[{\"OrderID\":\"LD201910281623031354397\",\"Amount\":3380.0,\"OrderDate\":\"2019/10/28 16:23:03\",\"ProductName\":\"新版净牌-雪莲滋养贴200片\",\"ProductNumber\":1,\"ItemCode\":\"888890-01\",\"CreateTime\":\"2019-10-28 16:23:23\",\"AmountType\":1,\"Item\":[{\"UserType\":5,\"TypeName\":\"魅力合伙人分账\",\"Amount\":338.00,\"Proportion\":0.10},{\"UserType\":0,\"TypeName\":\"门店分账\",\"Amount\":1318.20,\"Proportion\":0.39},{\"UserType\":1,\"TypeName\":\"代理商分账\",\"Amount\":507.00,\"Proportion\":0.15},{\"UserType\":2,\"TypeName\":\"供应商分账\",\"Amount\":338.00,\"Proportion\":0.10},{\"UserType\":3,\"TypeName\":\"平台分账\",\"Amount\":0.00,\"Proportion\":0.00}]}],\"Msg\":\"成功\"}";
 		SendsGoodsData orderReturns=JSON.parseObject(result, SendsGoodsData.class);

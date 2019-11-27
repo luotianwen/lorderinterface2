@@ -37,16 +37,12 @@ public class OrderController extends Controller {
 					" \"ProductNumber\": 1," +
 					" \"ItemCode\": \"899900\"," +
 					" \"CreateTime\": \"2019-1-1 00:00:00\"," +
-					" \"Item\": [{" +
-					"  \"UserType\": 1," +
-					"  \"TypeName\": \"平台\"," +
-					"  \"Amount\": 100.00," +
-					"  \"Proportion\": 0.01" +
-					" }, {" +
+					" \"Item\": [ " +
 					"  \"UserType\": 2," +
 					"  \"TypeName\": \"供应商\"," +
 					"  \"Amount\": 5000.00," +
-					"  \"Proportion\": 0.5" +
+					"  \"Proportion\": 0.5," +
+					   "UserID\":-1,\"Name\":\"平台\""+
 					" }]" +
 					"}]")
 	})

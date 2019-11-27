@@ -41,6 +41,24 @@ public abstract class BaseTaskLineMoney<M extends BaseTaskLineMoney<M>> extends 
 		return getStr("typeName");
 	}
 
+
+
+	public void setUserID(java.lang.Integer userType) {
+		set("userID", userType);
+	}
+
+	public java.lang.Integer getUserID() {
+		return getInt("userID");
+	}
+
+	public void setName(java.lang.String typeName) {
+		set("name", typeName);
+	}
+
+	public java.lang.String getName() {
+		return getStr("name");
+	}
+
 	/**
 	 * 分账金额
 	 */

@@ -450,6 +450,8 @@ public class OrderService {
                 tm.setProportion(ib.getProportion());
                 tm.setTypeName(ib.getTypeName());
                 tm.setUserType(ib.getUserType());
+                tm.setUserID(ib.getUserID());
+                tm.setName(ib.getName());
                 tm.save();
 
             }
