@@ -2,6 +2,7 @@ package com.order.www.orderInterface.common;
 
 
 import com.jfinal.kit.PropKit;
+import com.jfinal.log.Log;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -18,10 +19,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class OrderStatic {
+    static Log log = Log.getLog(OrderStatic.class);
     //向供应商分发订单，由平台提供
     public static final String  SendOrder=PropKit.get("lxd.url")+"/api/Interface/SendOrder";
    //供应商发货后向平台通知发货状态，由平台提供
@@ -40,8 +41,8 @@ public class OrderStatic {
         byte[] secretBytes = null;
         try {
             secretBytes = MessageDigest.getInstance("md5").digest(
-                    plainText.getBytes());
-        } catch (NoSuchAlgorithmException e) {
+                    plainText.getBytes("UTF-8"));
+        } catch (Exception e) {
             throw new RuntimeException("没有这个md5算法！");
         }
         String md5code = new BigInteger(1, secretBytes).toString(16);
@@ -141,10 +142,12 @@ public class OrderStatic {
         Map<String, String> headers=new HashMap<>();
         headers.put("From", PropKit.get("lxd.From"));
         //随机数+空格+MD5（MD5（KEY）+随机数）
-        int r=new Random().nextInt();
+        int r=4;
         String keys=PropKit.get("lxd.Key");
-        String key=r+" "+ md5(md5(keys).toUpperCase()+r).toUpperCase();
+        //String key=r+" "+ md5(md5(keys).toUpperCase()+r).toUpperCase();
+        String key=4+" "+"5CF509AC0EA56D06BB6FF02425CAE087";
         headers.put("Authorization",key);
+        log.info("keys:"+key);
        // System.out.println(headers.toString());
         return post(url,params,headers);
     }
