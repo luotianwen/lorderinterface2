@@ -215,7 +215,7 @@ public class OrderService {
                 sjkc = sjkc - tl.getAmount();
                 if (sjkc < 0) {
                     Db.tx(() -> {
-                        Db.update("update pool_task  set haveAmount=null where id=?", tl.getPoolTaskId());
+                        Db.update("update pool_task  set haveAmount=0 where id=?", tl.getPoolTaskId());
                         return true;
                     });
                     break;
