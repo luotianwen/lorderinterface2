@@ -163,6 +163,9 @@ public class OrderService {
                     sjkc = sr.getData().get(0).getQuantity();
                     ck = sr.getData().get(0).getWharehouse();
                 }
+                else{
+                    sjkc=0;
+                }
             }
             //ShipperID！=0 ShipperType=2  有物流单号  不查询库
             else {
@@ -171,6 +174,9 @@ public class OrderService {
                     if (null != sr && sr.getCode().equals("0") && sr.getData().size() > 0) {
                         sjkc = sr.getData().get(0).getQuantity();
                         ck = sr.getData().get(0).getWharehouse();
+                    }
+                    else{
+                        sjkc=0;
                     }
                 }
             }
