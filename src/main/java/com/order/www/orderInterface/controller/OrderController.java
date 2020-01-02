@@ -8,14 +8,13 @@ import com.jfinal.core.Controller;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
-import com.order.www.orderInterface.entity.GetMoney;
-import com.order.www.orderInterface.entity.OrderEntity;
-import com.order.www.orderInterface.entity.TransferData;
+import com.order.www.orderInterface.entity.*;
 import com.order.www.orderInterface.service.OrderService;
 import top.hequehua.swagger.annotation.*;
 import top.hequehua.swagger.config.DataType;
 import top.hequehua.swagger.config.RequestMethod;
 
+import java.net.URLDecoder;
 import java.util.List;
 
 /**
@@ -301,24 +300,31 @@ public class OrderController extends Controller {
 		System.out.println(jsonResult);
 		renderJson(jsonResult);
 	}*/
-	/*@ApiOperation(tags="order", methods= RequestMethod.GET,produces = "application/json",description ="物流订阅" )
-	*//*@ApiParams({
-			@ApiParam(name="userName",required=false,description="分账信息")
-	})*//*
+	 @ApiOperation(tags="order", methods= RequestMethod.GET,produces = "application/json",description ="物流订阅" )
+	 @ApiParams({
+			@ApiParam(name="userName",required=false,description="" +
+					"RequestType=101&RequestData={\"PushTime\":\"2019-04-06 13:29:04\",\"EBusinessID\":\"1568694\",\"Data\":[{\"LogisticCode\":\"1234561\",\"ShipperCode\":\"SF\",\"Traces\":[{\"AcceptStation\":\"顺丰速运已收取快件\",\"AcceptTime\":\"2019-04-06 13:29:04\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经到达深圳\",\"AcceptTime\":\"2019-04-06 13:29:042\",\"Remark\":\"\"},{\"AcceptStation\":\"货物到达福田保税区网点\",\"AcceptTime\":\"2019-04-06 13:29:043\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经被张三签收了\",\"AcceptTime\":\"2019-04-06 13:29:044\",\"Remark\":\"\"}],\"State\":\"3\",\"EBusinessID\":\"test1261557\",\"Success\":true,\"Reason\":\"\",\"CallBack\":\"\",\"EstimatedDeliveryTime\":\"2019-04-06 13:29:04\"}],\"Count\":\"1\"}&DataType=2&DataSign=1&EBusinessID=1568694RequestType=101&RequestData={\"PushTime\":\"2019-04-06 13:29:04\",\"EBusinessID\":\"1568694\",\"Data\":[{\"LogisticCode\":\"1234561\",\"ShipperCode\":\"SF\",\"Traces\":[{\"AcceptStation\":\"顺丰速运已收取快件\",\"AcceptTime\":\"2019-04-06 13:29:04\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经到达深圳\",\"AcceptTime\":\"2019-04-06 13:29:042\",\"Remark\":\"\"},{\"AcceptStation\":\"货物到达福田保税区网点\",\"AcceptTime\":\"2019-04-06 13:29:043\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经被张三签收了\",\"AcceptTime\":\"2019-04-06 13:29:044\",\"Remark\":\"\"}],\"State\":\"3\",\"EBusinessID\":\"test1261557\",\"Success\":true,\"Reason\":\"\",\"CallBack\":\"\",\"EstimatedDeliveryTime\":\"2019-04-06 13:29:04\"}],\"Count\":\"1\"}&DataType=2&DataSign=1&EBusinessID=1568694\n" +
+					"\t")
+	})
 	@ApiResponses({
 			@ApiResponse(code ="state",message = "状态 ok 为成功")
 
-	})*/
-	/*
-	  * 物流信息订阅
-	 *//*
+	})
 	public void subscript() throws Exception {
-		String result=getRawData();
-		System.out.println(result);
-		SearchData searchData= JSON.parseObject(result, SearchData.class);
-		orderService.subscript(searchData);
-		renderJson(Ret.ok());
-	}*/
+	 	String requestData= URLDecoder.decode(getPara("RequestData"),"UTF-8");
+		 log.info("RequestData:"+requestData);
+
+		 /* SearchData searchData= JSON.parseObject(requestData, SearchData.class);*/
+
+
+		 SubReqData subReqData= JSON.parseObject(requestData, SubReqData.class);
+		 SubReturnData subReturnData=new SubReturnData();
+		 subReturnData.setEbusinessID(subReqData.getEBusinessID());
+		 subReturnData.setSuccess(true);
+		 subReturnData.setUpdateTime(subReqData.getPushTime());
+		 orderService.subscript(subReqData);
+		renderJson(subReturnData);
+	}
 
 
 	@ApiOperation(tags="order", methods= RequestMethod.GET,produces = "application/json",description ="首页" )

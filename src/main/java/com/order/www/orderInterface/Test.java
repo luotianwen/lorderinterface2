@@ -1,9 +1,11 @@
 package com.order.www.orderInterface;
 
 
-
+import com.alibaba.fastjson.JSON;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.plugin.activerecord.Record;
+import com.order.www.orderInterface.entity.OrderEntity;
+import com.order.www.orderInterface.entity.OrderTask;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -46,7 +48,11 @@ public class Test {
         //salesorder();
         //salesdelivery();
         //stock();
-
+        String result="{\"OrderID\":\"LD201912302015074696621\",\"ReceiveName\":\"杨晓玲\",\"Mobile\":\"13986832289\",\"CardCode\":\"800099\",\"DocDueDate\":\"2019-12-30T20:15:08.873\",\"OrderAddress\":\"栖凤阳光1幢503\",\"ProName\":\"湖北\",\"CityName\":\"宜昌市\",\"DisName\":\"远安县\",\"UserID\":116602,\"Remark\":\"\",\"OrderClass\":0,\"UserName\":\"LH0L40002\",\"PayName\":\"银行转帐\",\"ActivityType\":0,\"ActivityTypeName\":null,\"ActivityID\":0,\"ActivityName\":null,\"CreateUserID\":0,\"CreateUserName\":null,\"CouponID\":0,\"CouponName\":null,\"Items\":[{\"ItemCode\":\"899386-1\",\"QuanTity\":3,\"Price\":100.00,\"ProductName\":\"佛初草单瓶装(加赠)  \",\"Score\":0.00,\"SupplierID\":0,\"SupplierName\":\"平台供货商\",\"ProductType\":2,\"PayAmount\":100.00,\"PayAmountSum\":300.00,\"PriceSum\":300.00,\"ReductionAmount\":0.00,\"AgentType\":9600,\"SAPSupplierID\":\"900001\"}],\"ShipperType\":2,\"ShipperID\":0,\"ShipperName\":\"平台供货商\",\"PayableAmount\":300.00,\"PayAmount\":300.00,\"ReductionAmount\":0.00,\"Score\":0.00,\"AgentType\":9600,\"SAPSupplierID\":\"900001\"}";
+        OrderEntity orderEntity= JSON.parseObject(result, OrderEntity.class);
+        OrderTask ot = new OrderTask();
+        ot.setTaskGenDatetime(orderEntity.getDocDueDate());
+        System.out.println(ot);
     }
     public static void  stock(){
         String url=sap+"v1/stock";

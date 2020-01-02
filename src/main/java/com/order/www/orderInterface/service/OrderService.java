@@ -459,17 +459,22 @@ public class OrderService {
     }
 
     @Before(Tx.class)
-    public void subscript(SearchData searchData) {
-        if (searchData.isSuccess()) {
+    public void subscript(SubReqData searchData) {
+        for ( SubReqData.DataBean sds:searchData.getData()
+             ) {
+            if (sds.isSuccess()) {
 //物流状态: 0-无轨迹，1-已揽收，2-在途中，3-签收,4-问题件
-            if (3 == searchData.getState()) {
-                Db.update("update pool_task  set recall_status=? where carriers like '%?%'", "1", searchData.getLogisticCode());
-            } else if (4 == searchData.getState()) {
-                Db.update("update pool_task  set recall_status=? where carriers like '%?%'", "2", searchData.getLogisticCode());
+                if ("3" == sds.getState()) {
+                    Db.update("update pool_task  set recall_status=? where carriers like '%?%'", "1", sds.getLogisticCode());
+                } else if ("4" == sds.getState()) {
+                    Db.update("update pool_task  set recall_status=? where carriers like '%?%'", "2", sds.getLogisticCode());
+                }
+                //String id = UUID.randomUUID().toString().replace("-", "");
+                //log.info(JSON.toJSONString(sds));
+               // Db.update("insert into pool_logistic values(?,?,?,?)", id, sds.getLogisticCode(), JSON.toJSONString(sds), new Date());
             }
-            String id = UUID.randomUUID().toString().replace("-", "");
-            Db.update("insert into pool_logistic values(?,?,?,?)", id, searchData.getLogisticCode(), JSON.toJSON(searchData), new Date());
         }
+
     }
 
     /**
