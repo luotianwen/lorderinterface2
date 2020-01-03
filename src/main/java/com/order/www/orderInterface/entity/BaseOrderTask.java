@@ -107,6 +107,19 @@ public abstract class BaseOrderTask<M extends BaseOrderTask<M>> extends Model<M>
 	public java.lang.String getRemark() {
 		return getStr("remark");
 	}
+	/**
+	 * 订单集成ID，UUID
+	 */
+	public void setRemarks(java.lang.String remarks) {
+		set("remarks", remarks);
+	}
+
+	/**
+	 * 订单集成ID，UUID
+	 */
+	public java.lang.String getRemarks() {
+		return getStr("remarks");
+	}
 
 	/**
 	 * 订单集成单号

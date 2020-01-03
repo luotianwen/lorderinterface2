@@ -8,6 +8,7 @@ import com.jfinal.core.Controller;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
+import com.jfinal.plugin.activerecord.Record;
 import com.order.www.orderInterface.entity.*;
 import com.order.www.orderInterface.service.OrderService;
 import top.hequehua.swagger.annotation.*;
@@ -300,11 +301,15 @@ public class OrderController extends Controller {
 		System.out.println(jsonResult);
 		renderJson(jsonResult);
 	}*/
-	 @ApiOperation(tags="order", methods= RequestMethod.GET,produces = "application/json",description ="物流订阅" )
+	 @ApiOperation(tags="物流订阅", methods= RequestMethod.POST,produces = "application/json",description ="物流订阅" )
 	 @ApiParams({
-			@ApiParam(name="userName",required=false,description="" +
-					"RequestType=101&RequestData={\"PushTime\":\"2019-04-06 13:29:04\",\"EBusinessID\":\"1568694\",\"Data\":[{\"LogisticCode\":\"1234561\",\"ShipperCode\":\"SF\",\"Traces\":[{\"AcceptStation\":\"顺丰速运已收取快件\",\"AcceptTime\":\"2019-04-06 13:29:04\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经到达深圳\",\"AcceptTime\":\"2019-04-06 13:29:042\",\"Remark\":\"\"},{\"AcceptStation\":\"货物到达福田保税区网点\",\"AcceptTime\":\"2019-04-06 13:29:043\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经被张三签收了\",\"AcceptTime\":\"2019-04-06 13:29:044\",\"Remark\":\"\"}],\"State\":\"3\",\"EBusinessID\":\"test1261557\",\"Success\":true,\"Reason\":\"\",\"CallBack\":\"\",\"EstimatedDeliveryTime\":\"2019-04-06 13:29:04\"}],\"Count\":\"1\"}&DataType=2&DataSign=1&EBusinessID=1568694RequestType=101&RequestData={\"PushTime\":\"2019-04-06 13:29:04\",\"EBusinessID\":\"1568694\",\"Data\":[{\"LogisticCode\":\"1234561\",\"ShipperCode\":\"SF\",\"Traces\":[{\"AcceptStation\":\"顺丰速运已收取快件\",\"AcceptTime\":\"2019-04-06 13:29:04\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经到达深圳\",\"AcceptTime\":\"2019-04-06 13:29:042\",\"Remark\":\"\"},{\"AcceptStation\":\"货物到达福田保税区网点\",\"AcceptTime\":\"2019-04-06 13:29:043\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经被张三签收了\",\"AcceptTime\":\"2019-04-06 13:29:044\",\"Remark\":\"\"}],\"State\":\"3\",\"EBusinessID\":\"test1261557\",\"Success\":true,\"Reason\":\"\",\"CallBack\":\"\",\"EstimatedDeliveryTime\":\"2019-04-06 13:29:04\"}],\"Count\":\"1\"}&DataType=2&DataSign=1&EBusinessID=1568694\n" +
-					"\t")
+			@ApiParam(name="RequestType",required=false,description="101"),
+			 @ApiParam(name="RequestData",required=false,description="" +
+					 "RequestData={\"PushTime\":\"2019-04-06 13:29:04\",\"EBusinessID\":\"1568694\",\"Data\":[{\"LogisticCode\":\"1234561\",\"ShipperCode\":\"SF\",\"Traces\":[{\"AcceptStation\":\"顺丰速运已收取快件\",\"AcceptTime\":\"2019-04-06 13:29:04\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经到达深圳\",\"AcceptTime\":\"2019-04-06 13:29:042\",\"Remark\":\"\"},{\"AcceptStation\":\"货物到达福田保税区网点\",\"AcceptTime\":\"2019-04-06 13:29:043\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经被张三签收了\",\"AcceptTime\":\"2019-04-06 13:29:044\",\"Remark\":\"\"}],\"State\":\"3\",\"EBusinessID\":\"test1261557\",\"Success\":true,\"Reason\":\"\",\"CallBack\":\"\",\"EstimatedDeliveryTime\":\"2019-04-06 13:29:04\"}],\"Count\":\"1\"}&DataType=2&DataSign=1&EBusinessID=1568694RequestType=101&RequestData={\"PushTime\":\"2019-04-06 13:29:04\",\"EBusinessID\":\"1568694\",\"Data\":[{\"LogisticCode\":\"1234561\",\"ShipperCode\":\"SF\",\"Traces\":[{\"AcceptStation\":\"顺丰速运已收取快件\",\"AcceptTime\":\"2019-04-06 13:29:04\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经到达深圳\",\"AcceptTime\":\"2019-04-06 13:29:042\",\"Remark\":\"\"},{\"AcceptStation\":\"货物到达福田保税区网点\",\"AcceptTime\":\"2019-04-06 13:29:043\",\"Remark\":\"\"},{\"AcceptStation\":\"货物已经被张三签收了\",\"AcceptTime\":\"2019-04-06 13:29:044\",\"Remark\":\"\"}],\"State\":\"3\",\"EBusinessID\":\"test1261557\",\"Success\":true,\"Reason\":\"\",\"CallBack\":\"\",\"EstimatedDeliveryTime\":\"2019-04-06 13:29:04\"}],\"Count\":\"1\"}" +
+					 "\t"),
+			 @ApiParam(name="DataType",required=false,description="2"),
+			 @ApiParam(name="DataSign",required=false,description="1" ),
+			 @ApiParam(name="EBusinessID",required=false,description="EBusinessID=1568694")
 	})
 	@ApiResponses({
 			@ApiResponse(code ="state",message = "状态 ok 为成功")
@@ -318,10 +323,11 @@ public class OrderController extends Controller {
 
 
 		 SubReqData subReqData= JSON.parseObject(requestData, SubReqData.class);
-		 SubReturnData subReturnData=new SubReturnData();
-		 subReturnData.setEbusinessID(subReqData.getEBusinessID());
-		 subReturnData.setSuccess(true);
-		 subReturnData.setUpdateTime(subReqData.getPushTime());
+		 Record subReturnData=new Record();
+		 subReturnData.set("EBusinessID",subReqData.getEBusinessID());
+		 subReturnData.set("Success",true);
+		 subReturnData.set("Reason","");
+		 subReturnData.set("UpdateTime",subReqData.getPushTime());
 		 orderService.subscript(subReqData);
 		renderJson(subReturnData);
 	}

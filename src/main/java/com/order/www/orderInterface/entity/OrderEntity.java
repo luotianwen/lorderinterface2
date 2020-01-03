@@ -53,6 +53,16 @@ public class OrderEntity implements Serializable {
     private String disName;
     private String userID;
     private String remark;
+    private String businessRemark;
+
+    public String getBusinessRemark() {
+        return businessRemark;
+    }
+
+    public void setBusinessRemark(String businessRemark) {
+        this.businessRemark = businessRemark;
+    }
+
     private int orderClass;
     private String userName;
     private String payName;

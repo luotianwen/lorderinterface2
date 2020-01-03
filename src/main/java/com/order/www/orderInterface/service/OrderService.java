@@ -605,8 +605,7 @@ public class OrderService {
         ot.setScore(new BigDecimal(oe.getScore()));
         ot.setAgentType(oe.getAgentType());
         ot.setSAPSupplierID(oe.getSapSupplierID());
-
-
+        ot.setRemarks(oe.getBusinessRemark());
 
         for (TaskLine t : tks
         ) {
