@@ -134,9 +134,9 @@ public class OrderService {
         return sr;
     }
     public void b2cWarhouse(String product_Class) {
-
+        //门店交货的不需要做SAP销售订单和销售交货 and  pt.sale_group='2'
         List<Record> ots = Db.find("select ptl.product_no as no , pt.agentType , pt.sapSupplierID,pt.shipperID ,pt.sale_group as shipperType,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
-                "where pool_task_id=pt.id and  pt.task_type='0' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
+                "where pool_task_id=pt.id and  pt.task_type='0' and  pt.sale_group='2' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
                 "GROUP BY    ptl.product_no,pt.agentType,pt.sapSupplierID,pt.shipperID,pt.sale_group ");
 
         Date currentTime = new Date();
@@ -170,14 +170,14 @@ public class OrderService {
             //ShipperID！=0 ShipperType=2  有物流单号  不查询库
             else {
                 if (  "1".equals(r.getStr("shipperType"))) {
-                    StockReData sr = getSapStockByItemCode(r.getStr("no"));
+                   /* StockReData sr = getSapStockByItemCode(r.getStr("no"));
                     if (null != sr && sr.getCode().equals("0") && sr.getData().size() > 0) {
                         sjkc = sr.getData().get(0).getQuantity();
                         ck = sr.getData().get(0).getWharehouse();
                     }
-                    else{
+                    else{*/
                         sjkc=0;
-                    }
+                  /*  }*/
                 }
             }
             boolean save = false;
