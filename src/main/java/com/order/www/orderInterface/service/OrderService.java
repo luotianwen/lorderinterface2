@@ -30,7 +30,7 @@ public class OrderService {
      */
     public void b2bbatch() {
         List<Record> ots = Db.find("select DISTINCT(pt.id)as id,pt.task_type as orderclass , pt.agentType ,pt.shipperID, pt.sapSupplierID  from pool_task pt,pool_task_line ptl " +
-                "where pool_task_id=pt.id and  pt.task_type='1'   and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY)");
+                "where pool_task_id=pt.id and  pt.task_type='1' and  pt.consignee_phone not in(select phone from pool_black )  and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY)");
 
         //List<Record> ots = Db.find("select id from pool_task where task_type='1' and  ptl.batch_num  is null and date(task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) ");
         //读取前一天的订单数据
@@ -136,7 +136,7 @@ public class OrderService {
     public void b2cWarhouse(String product_Class) {
         //门店交货的不需要做SAP销售订单和销售交货 and  pt.sale_group='2'
         List<Record> ots = Db.find("select ptl.product_no as no , pt.agentType , pt.sapSupplierID,pt.shipperID ,pt.sale_group as shipperType,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
-                "where pool_task_id=pt.id and  pt.task_type='0' and  pt.sale_group='2' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
+                "where pool_task_id=pt.id and  pt.task_type='0' and  pt.consignee_phone not in(select phone from pool_black )  and  pt.sale_group='2' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
                 "GROUP BY    ptl.product_no,pt.agentType,pt.sapSupplierID,pt.shipperID,pt.sale_group ");
 
         Date currentTime = new Date();
@@ -312,12 +312,12 @@ public class OrderService {
                 "    \"Msg\": \"成功\"\n" +
                 "}";*/
         String json = OrderStatic.lxdpost(OrderStatic.SendOrder, map);
-       // System.out.println(json);
+    /*   // System.out.println(json);
         OrderJson oj = new OrderJson();
         oj.setContent(json);
         oj.setCreateDate(new Date());
         oj.setId(UUID.randomUUID().toString().replaceAll("-", ""));
-        oj.save();
+        oj.save();*/
        // System.out.println(json);
         log.info(json);
         ResponseEntity<OrderBean> datas = JSON.parseObject(json, new TypeReference<ResponseEntity<OrderBean>>(ResponseEntity.class, OrderBean.class, OrderEntity.class) {
@@ -328,7 +328,7 @@ public class OrderService {
             List<OrderEntity> oes = datas.getResult().getList();
 
 
-            Date currentTime = new Date();
+         /*   Date currentTime = new Date();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
             String dateString = "DD" + formatter.format(currentTime);
             Record r = Db.findFirst("select pool_task_no as no from pool_task where pool_task_no like '" + dateString + "%' order by create_date desc");
@@ -342,17 +342,17 @@ public class OrderService {
                 newStrNum = String.format("%05d", newNum);
             } else {
                 newNum = Integer.parseInt(no1.substring(10, no1.length()));
-            }
+            }*/
 
 
             for (OrderEntity oe : oes
             ) {
-                newNum++;
+               /* newNum++;
                 //数字长度为5位，长度不够数字前面补0
                 newStrNum = String.format("%05d", newNum);
-                no1 = dateString + newStrNum;
+                no1 = dateString + newStrNum;*/
 
-                String no = no1;
+                String no = oe.getOrderID();
                 String oid = UUID.randomUUID().toString().replaceAll("-", "");
                 List<OrderEntity.ItemsBean> obs = oe.getItems();
                 List<TaskLine> tks = new ArrayList<>();
@@ -523,7 +523,7 @@ public class OrderService {
     }
 
     public void SendOrder(OrderEntity oe) {
-        BigDecimal db = BigDecimal.ZERO;
+       /* BigDecimal db = BigDecimal.ZERO;
         Date currentTime = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
         String dateString = "DD" + formatter.format(currentTime);
@@ -545,8 +545,8 @@ public class OrderService {
         //数字长度为5位，长度不够数字前面补0
         newStrNum = String.format("%05d", newNum);
         no1 = dateString + newStrNum;
-
-        String no = no1;
+*/
+        String no = oe.getOrderID();
         String oid = UUID.randomUUID().toString().replaceAll("-", "");
         List<OrderEntity.ItemsBean> obs = oe.getItems();
         List<TaskLine> tks = new ArrayList<>();
@@ -685,10 +685,10 @@ public class OrderService {
      * 凭单接口
      */
     public void sapProfit() {
-        List<Record> tasklist = Db.find("select DISTINCT pt.id ,pt.task_no from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where    (ptlm.userType=3  or (ptlm.userType=2 and ptlm.userID=0)) and     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null");
+        List<Record> tasklist = Db.find("select DISTINCT pt.id ,pt.task_no from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where    (ptlm.userType=3  or (ptlm.userType=2 and ptlm.userID=0)) and  pt.consignee_phone not in(select phone from pool_black ) and     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null");
         for (Record task : tasklist
         ) {
-            List<Record> list = Db.find("select pt.task_no as platNo,pt.task_type as orderClass ,ptl.product_class as productType,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName,  ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id ,ptlm.userType from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where  ptlm.userType=3 and    pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null and pt.id=?", task.getStr("id"));
+            List<Record> list = Db.find("select pt.task_no as platNo,pt.task_type as orderClass ,ptl.product_class as productType,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName,  ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id ,ptlm.userType from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where  ptlm.userType=3 and  pt.consignee_phone not in(select phone from pool_black ) and    pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null and pt.id=?", task.getStr("id"));
             String param=JsonKit.toJson(list);
             String json = OrderStatic.post(OrderStatic.journal,param);
             log.info("凭单接口参数"+param);

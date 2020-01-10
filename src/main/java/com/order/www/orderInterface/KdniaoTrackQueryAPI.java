@@ -1,9 +1,5 @@
 package com.order.www.orderInterface;
 
-import com.alibaba.fastjson.JSON;
-import com.order.www.orderInterface.entity.SubReqData;
-import com.order.www.orderInterface.entity.SubReturnData;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -40,125 +36,7 @@ public class KdniaoTrackQueryAPI {
 
     //DEMO
     public static void main(String[] args) {
-       String str="{\n" +
-               "        \"EBusinessID\": \"1109259\",\n" +
-               "        \"Count\": \"2\",\n" +
-               "        \"PushTime\": \"2015-3-11 16:21:06\",\n" +
-               "        \"Data\": [\n" +
-               "            {\n" +
-               "                \"EBusinessID\": \"1109259\",\n" +
-               "                \"OrderCode\": \"\",\n" +
-               "                \"ShipperCode\": \"EMS\",\n" +
-               "                \"LogisticCode\": \"5042260908504\",\n" +
-               "                \"Success\": true,\n" +
-               "                \"Reason\": \"\",\n" +
-               "                \"State\": \"2\",\n" +
-               "                \"CallBack\": \"0\",\n" +
-               "                \"Traces\": [\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-06 21:16:58\",\n" +
-               "                        \"AcceptStation\": \"深圳市横岗速递营销部已收件，（揽投员姓名：钟定基;联系电话：）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-07 14:25:00\",\n" +
-               "                        \"AcceptStation\": \"离开深圳市 发往广州市\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-08 00:17:00\",\n" +
-               "                        \"AcceptStation\": \"到达广东速递物流公司广航中心处理中心（经转）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-08 01:15:00\",\n" +
-               "                        \"AcceptStation\": \"离开广州市 发往北京市（经转）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-09 09:01:00\",\n" +
-               "                        \"AcceptStation\": \"到达北京黄村转运站处理中心（经转）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-09 18:39:00\",\n" +
-               "                        \"AcceptStation\": \"离开北京市 发往呼和浩特市（经转）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-10 18:06:00\",\n" +
-               "                        \"AcceptStation\": \"到达  呼和浩特市 处理中心\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-11 09:53:48\",\n" +
-               "                        \"AcceptStation\": \"呼和浩特市邮政速递物流分公司金川揽投部安排投递（投递员姓名：安长虹;联系电话：18047140142）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    }\n" +
-               "                ]\n" +
-               "            },\n" +
-               "            {\n" +
-               "                \"EBusinessID\": \"1109259\",\n" +
-               "                \"OrderCode\": \"\",\n" +
-               "                \"ShipperCode\": \"EMS\",\n" +
-               "                \"LogisticCode\": \"5042260943004\",\n" +
-               "                \"Success\": true,\n" +
-               "                \"Reason\": \"\",\n" +
-               "                \"State\": \"2\",\n" +
-               "                \"CallBack\": \"0\",\n" +
-               "                \"Traces\": [\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-07 15:26:09\",\n" +
-               "                        \"AcceptStation\": \"深圳市横岗速递营销部已收件，（揽投员姓名：周宏彪;联系电话：13689537568）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-08 16:32:00\",\n" +
-               "                        \"AcceptStation\": \"离开深圳市 发往广州市\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-09 00:58:00\",\n" +
-               "                        \"AcceptStation\": \"到达广东速递物流公司广航中心处理中心（经转）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-09 01:15:00\",\n" +
-               "                        \"AcceptStation\": \"离开广州市 发往北京市（经转）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-10 05:20:00\",\n" +
-               "                        \"AcceptStation\": \"到达北京黄村转运站处理中心（经转）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-10 11:59:00\",\n" +
-               "                        \"AcceptStation\": \"离开北京市 发往廊坊市（经转）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-10 14:23:00\",\n" +
-               "                        \"AcceptStation\": \"到达廊坊市处理中心（经转）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    },\n" +
-               "                    {\n" +
-               "                        \"AcceptTime\": \"2015-03-11 08:55:00\",\n" +
-               "                        \"AcceptStation\": \"离开廊坊市 发往保定市（经转）\",\n" +
-               "                        \"Remark\": \"\"\n" +
-               "                    }\n" +
-               "                ]\n" +
-               "            }\n" +
-               "        ]\n" +
-               "    }";
 
-        SubReqData subReqData= JSON.parseObject(str, SubReqData.class);
-        SubReturnData subReturnData=new SubReturnData();
-        subReturnData.setEbusinessID(subReqData.getEBusinessID());
-        subReturnData.setSuccess(true);
-        subReturnData.setUpdateTime(subReqData.getPushTime());
-        System.out.println(subReqData);
-        System.out.println(subReturnData);
     }
 
 

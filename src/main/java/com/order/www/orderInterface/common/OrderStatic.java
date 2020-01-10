@@ -27,6 +27,8 @@ public class OrderStatic {
     public static final String  SendOrder=PropKit.get("lxd.url")+"/api/Interface/SendOrder";
    //供应商发货后向平台通知发货状态，由平台提供
     public static final String  SendGoods=PropKit.get("lxd.url")+"/api/Interface/SendGoods";
+    //获取分账信息接口（平台提供）
+    public static final String  GetTransfer=PropKit.get("lxd.url")+"/api/Interface/GetTransfer";
     //sap1、凭单接口  接口地址：http://172.17.250.191:9091/v1/journal
     public static final String journal=PropKit.get("sap.url")+"/v1/journal";
     //销售订单接口  接口地址：http://172.17.250.191:9091/v1/salesorder
