@@ -11,6 +11,20 @@ public abstract class BaseBatchLine<M extends BaseBatchLine<M>> extends Model<M>
 	/**
 	 * 供应商id
 	 */
+	public void setBusinessType(int id) {
+		set("BusinessType", id);
+	}
+
+	/**
+	 * 供应商id
+	 */
+	public int getBusinessType() {
+		return getInt("BusinessType");
+	}
+
+	/**
+	 * 供应商id
+	 */
 	public void setSupplierID(int id) {
 		set("supplierID", id);
 	}

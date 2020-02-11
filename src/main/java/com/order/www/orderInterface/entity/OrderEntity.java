@@ -377,6 +377,15 @@ public class OrderEntity implements Serializable {
         private int supplierID;
         private String supplierName;
         private int productType;
+        private int businessType;
+
+        public int getBusinessType() {
+            return businessType;
+        }
+
+        public void setBusinessType(int businessType) {
+            this.businessType = businessType;
+        }
 
         public double getPayAmount() {
             return payAmount;
