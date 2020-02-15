@@ -17,7 +17,7 @@ public class TransferData {
      */
 
     private String orderID;
-    private int amount;
+    private double amount;
     private int amountType;
     private String orderDate;
     private String productName;
@@ -34,11 +34,11 @@ public class TransferData {
         this.orderID = orderID;
     }
 
-    public int getAmount() {
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 

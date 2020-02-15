@@ -30,6 +30,14 @@ public abstract class BaseTaskLine<M extends BaseTaskLine<M>> extends Model<M> i
 		set("score", score);
 	}
 	public java.math.BigDecimal getScore() {	return get("score");	}
+
+	public void setWhareHouse(java.lang.String id) {
+		set("whareHouse", id);
+	}
+
+	public java.lang.String getWhareHouse() {
+		return getStr("whareHouse");
+	}
 	public void setAgentType(java.lang.String id) {
 		set("agentType", id);
 	}

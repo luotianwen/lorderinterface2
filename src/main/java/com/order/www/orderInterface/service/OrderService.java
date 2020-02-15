@@ -21,6 +21,109 @@ import java.util.*;
  */
 public class OrderService {
     Log log = Log.getLog(OrderService.class);
+    /**
+     * 库存
+     */
+    public void b2bbatchkc() {
+        List<Record> ots = Db.find("select DISTINCT(pt.id)as id,pt.task_type as orderclass , pt.agentType ,pt.shipperID, pt.sapSupplierID  from pool_task pt,pool_task_line ptl " +
+                "where pool_task_id=pt.id and  pt.task_type='1' and  pt.consignee_phone not in(select phone from pool_black )  and  (pt.haveAmount is null or pt.haveAmount='0')  and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY)");
+        for (Record r : ots
+                ) {
+            List<TaskLine> tls = TaskLine.dao.getTls(r.getStr("id"));
+            String ck = "A16";//B2B默认仓库
+            for (TaskLine tl : tls
+                    ) {
+                Db.tx(() -> {
+                    Db.update("update pool_task  set haveAmount='1' where id=?", tl.getPoolTaskId());
+                    Db.update("update pool_task_line set  whareHouse=? where id=?", ck, tl.getId());
+                      return true;
+                });
+            }
+        }
+        try {
+            Thread.sleep(3000L);
+            b2cMainbatchkc();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+    /**
+     * 库存
+     */
+    public void b2cMainbatchkc() {
+        b2cWarhousekc("1");
+
+    }
+    /**
+     * 库存
+     */
+    public void b2cWarhousekc(String product_Class) {
+        //门店交货的不需要做SAP销售订单和销售交货 and  pt.sale_group='2'
+        List<Record> ots = Db.find("select ptl.product_no as no , pt.agentType , pt.sapSupplierID,pt.shipperID ,pt.sale_group as shipperType,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
+                "where pool_task_id=pt.id and  pt.task_type='0' and  pt.consignee_phone not in(select phone from pool_black )  and  pt.sale_group='2' and ptl.product_Class='" + product_Class + "' and  (pt.haveAmount is null or pt.haveAmount='0') and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
+                "GROUP BY    ptl.product_no,pt.agentType,pt.sapSupplierID,pt.shipperID,pt.sale_group ");
+
+        //读取前一天的订单数据
+        for (Record r : ots
+                ) {
+            int sjkc = 100000;//调取库存接口
+            String ck = "A16";
+            //ShipperID=0  查询库存 做订单集成
+            if(r.getInt("shipperID")==0) {
+                StockReData sr = getSapStockByItemCode(r.getStr("no"));
+                if (null != sr && sr.getCode().equals("0") && sr.getData().size() > 0) {
+                    sjkc = sr.getData().get(0).getQuantity();
+                    ck = sr.getData().get(0).getWharehouse();
+                }
+                else{
+                    sjkc=0;
+                }
+            }
+            //ShipperID！=0 ShipperType=2  有物流单号  不查询库
+            else {
+                if (  "1".equals(r.getStr("shipperType"))) {
+
+                    sjkc=0;
+
+                }
+            }
+            List<TaskLine> tls = TaskLine.dao.getB2cTlsKc(r.getStr("no"), product_Class,r.getStr("agentType"),r.getStr("sapSupplierID"));
+            for (TaskLine tl : tls
+                    ) {
+                sjkc = sjkc - tl.getAmount();
+                if (sjkc < 0) {
+                    Db.tx(() -> {
+                        Db.update("update pool_task  set haveAmount=0 where id=?", tl.getPoolTaskId());
+                        return true;
+                    });
+                   continue;
+                }
+               else {
+                    String finalCk = ck;
+                    Db.tx(() -> {
+                        Db.update("update pool_task  set haveAmount='1' where id=?", tl.getPoolTaskId());
+                        Db.update("update pool_task_line set  whareHouse=? where id=?", finalCk, tl.getId());
+                        return true;
+                    });
+                }
+
+            }
+        }
+        try {
+            Thread.sleep(1000L);
+            if(product_Class.equals("1")) {
+                b2cGiftbatchkc();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+    public void b2cGiftbatchkc() {
+        b2cWarhousekc("2");
+    }
 
     /**
      * 生成订单接口服务
@@ -30,10 +133,9 @@ public class OrderService {
      */
     public void b2bbatch() {
         List<Record> ots = Db.find("select DISTINCT(pt.id)as id,pt.task_type as orderclass , pt.agentType ,pt.shipperID, pt.sapSupplierID  from pool_task pt,pool_task_line ptl " +
-                "where pool_task_id=pt.id and  pt.task_type='1' and  pt.consignee_phone not in(select phone from pool_black )  and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY)");
+                "where pool_task_id=pt.id and  pt.task_type='1' and  pt.consignee_phone not in(select phone from pool_black )  and  ptl.batch_num is null  and date(pt.send_store_datetime)=date(now())");
 
-        //List<Record> ots = Db.find("select id from pool_task where task_type='1' and  ptl.batch_num  is null and date(task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) ");
-        //读取前一天的订单数据
+          //读取前一天的订单数据
         for (Record r : ots
         ) {
             List<TaskLine> tls = TaskLine.dao.getTls(r.getStr("id"));
@@ -95,7 +197,7 @@ public class OrderService {
                 String finalCk = ck;
                 Db.tx(() -> {
                     bl.save();
-                    Db.update("update pool_task  set haveAmount='1' where id=?", tl.getPoolTaskId());
+                    //Db.update("update pool_task  set haveAmount='1' where id=?", tl.getPoolTaskId());
                     Db.update("update pool_task_line set batch_num =?,whareHouse=? where id=?", no, finalCk, tl.getId());
                     return true;
                 });
@@ -136,7 +238,7 @@ public class OrderService {
     public void b2cWarhouse(String product_Class) {
         //门店交货的不需要做SAP销售订单和销售交货 and  pt.sale_group='2'
         List<Record> ots = Db.find("select ptl.product_no as no , pt.agentType , pt.sapSupplierID,pt.shipperID ,pt.sale_group as shipperType,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
-                "where pool_task_id=pt.id and  pt.task_type='0' and  pt.consignee_phone not in(select phone from pool_black )  and  pt.sale_group='2' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY) " +
+                "where pool_task_id=pt.id and  pt.task_type='0' and  pt.consignee_phone not in(select phone from pool_black )  and  pt.sale_group='2' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.send_store_datetime)=date(now())" +
                 "GROUP BY    ptl.product_no,pt.agentType,pt.sapSupplierID,pt.shipperID,pt.sale_group ");
 
         Date currentTime = new Date();
@@ -154,33 +256,7 @@ public class OrderService {
         //读取前一天的订单数据
         for (Record r : ots
         ) {
-            int sjkc = 100000;//调取库存接口
-            String ck = "A16";
-            //ShipperID=0  查询库存 做订单集成
-            if(r.getInt("shipperID")==0) {
-                StockReData sr = getSapStockByItemCode(r.getStr("no"));
-                if (null != sr && sr.getCode().equals("0") && sr.getData().size() > 0) {
-                    sjkc = sr.getData().get(0).getQuantity();
-                    ck = sr.getData().get(0).getWharehouse();
-                }
-                else{
-                    sjkc=0;
-                }
-            }
-            //ShipperID！=0 ShipperType=2  有物流单号  不查询库
-            else {
-                if (  "1".equals(r.getStr("shipperType"))) {
-                   /* StockReData sr = getSapStockByItemCode(r.getStr("no"));
-                    if (null != sr && sr.getCode().equals("0") && sr.getData().size() > 0) {
-                        sjkc = sr.getData().get(0).getQuantity();
-                        ck = sr.getData().get(0).getWharehouse();
-                    }
-                    else{*/
-                        sjkc=0;
-                  /*  }*/
-                }
-            }
-            boolean save = false;
+
 
 
             BigDecimal db = BigDecimal.ZERO;
@@ -210,35 +286,22 @@ public class OrderService {
             batch.setBatchGenDatetime(new Date());
             List<TaskLine> tls = TaskLine.dao.getB2cTls(r.getStr("no"), product_Class,r.getStr("agentType"),r.getStr("sapSupplierID"));
             int amountCount=0;
-            for (TaskLine tl : tls
+          for (TaskLine tl : tls
             ) {
-                sjkc = sjkc - tl.getAmount();
-                if (sjkc < 0) {
-                    Db.tx(() -> {
-                        Db.update("update pool_task  set haveAmount=0 where id=?", tl.getPoolTaskId());
-                        return true;
-                    });
-                    break;
-                }
+
                 db = db.add(tl.getPayAmount());
                 db2 = db2.add(tl.getPayAmountSum());
                 amount = amount + tl.getAmount();
                 amountCount++;
 
-                String finalCk = ck;
                 Db.tx(() -> {
 
-                    Db.update("update pool_task  set haveAmount='1' where id=?", tl.getPoolTaskId());
-                    Db.update("update pool_task_line set batch_num =?,whareHouse=? where id=?", no, finalCk, tl.getId());
+                    Db.update("update pool_task_line set batch_num =? where id=?", no,  tl.getId());
                     return true;
                 });
 
-                save = true;
             }
-            //一个都没有
-            if (!save) {
-                continue;
-            }
+
 
 
             String oid = UUID.randomUUID().toString().replaceAll("-", "");
@@ -254,7 +317,7 @@ public class OrderService {
             bl.setSupplierID(tl.getSupplierID());
             bl.setSupplierName(tl.getSupplierName());
             bl.setProductClass(tl.getProductClass());
-            bl.setWhareHouse(ck);
+            bl.setWhareHouse(tl.getWhareHouse());
             bl.setAgentType(tl.getAgentType());
             bl.setSAPSupplierID(tl.getSAPSupplierID());
             batch.setCardCode(tl.getCardCode());
@@ -443,7 +506,7 @@ public class OrderService {
         for (TransferData transferData : orderReturns
         ) {
             List<TransferData.ItemBean> ibs = transferData.getItem();
-            TaskLine tl = TaskLine.dao.findFirst("select id from pool_task_line where  product_class in('1','3','5') and task_no=? and product_no=?", transferData.getOrderID(), transferData.getItemCode());
+            TaskLine tl = TaskLine.dao.findFirst("select id from pool_task_line where  product_class in('1','3','5') and task_no=? and product_no=? and priceSum=?", transferData.getOrderID(), transferData.getItemCode(),transferData.getAmount());
             if (null == tl) {
                 continue;
             }
@@ -801,7 +864,7 @@ public class OrderService {
         List<Record> list=new ArrayList<>();
         List<Record> list2=new ArrayList<>();
         for (Record task:tasklist) {
-            List<Record> os = Db.find("select  *   from   pool_task pt,pool_task_line ptl where    pt.task_status='1' and  pt.id=ptl.pool_task_id and ptl.batch_num=?",task.getStr("BATCH_NUM"));
+            List<Record> os = Db.find("select  *   from   pool_task pt,pool_task_line ptl where    pt.omsstatus<>'5' and  pt.id=ptl.pool_task_id and ptl.batch_num=?",task.getStr("BATCH_NUM"));
              if(null!=os&&os.size()>0)
             {
                 continue;
@@ -900,6 +963,6 @@ public class OrderService {
            throw new Exception("单号填写出错");
         }
         carriers=r.getStr("name")+" "+logisticsNum;
-        Db.update("UPDATE pool_task SET carriers =?, send_way =2, task_status='3', isThree=1, send_store_datetime = now() where task_no=?",carriers,orderID);
+        Db.update("UPDATE pool_task SET omsstatus='5', carriers =?, send_way =2, task_status='3', isThree=1, send_store_datetime = now() where task_no=?",carriers,orderID);
     }
 }
