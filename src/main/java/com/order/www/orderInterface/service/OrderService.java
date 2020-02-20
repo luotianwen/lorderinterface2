@@ -74,8 +74,15 @@ public class OrderService {
             if(r.getInt("shipperID")==0) {
                 StockReData sr = getSapStockByItemCode(r.getStr("no"));
                 if (null != sr && sr.getCode().equals("0") && sr.getData().size() > 0) {
-                    sjkc = sr.getData().get(0).getQuantity();
-                    ck = sr.getData().get(0).getWharehouse();
+                    int k=0;
+                    for (StockReData.DataBean d:sr.getData()){
+                        if(d.getQuantity()>k){
+                            k=d.getQuantity();
+                            ck=d.getWharehouse();
+                        }
+                    }
+                    sjkc = k;
+                    //ck = sr.getData().get(0).getWharehouse();
                 }
                 else{
                     sjkc=0;
@@ -232,6 +239,8 @@ public class OrderService {
     private StockReData getSapStockByItemCode(String itemCode){
 
         String json=OrderStatic.get(OrderStatic.salesstock+itemCode);
+        log.info(itemCode+"库存+"+json);
+
         StockReData sr=JSON.parseObject(json,StockReData.class);
         return sr;
     }
@@ -859,17 +868,20 @@ public class OrderService {
     销售交货接口
      */
     public void sapDelivery() {
+        //所有没交货的
         List<Record> tasklist = Db.find("select *  from   pool_batch  where    isok is  null");
 
         List<Record> list=new ArrayList<>();
         List<Record> list2=new ArrayList<>();
         for (Record task:tasklist) {
+            //检测sap交货情况
             List<Record> os = Db.find("select  *   from   pool_task pt,pool_task_line ptl where    pt.omsstatus<>'5' and  pt.id=ptl.pool_task_id and ptl.batch_num=?",task.getStr("BATCH_NUM"));
              if(null!=os&&os.size()>0)
             {
                 continue;
             }
             list2.add(task);
+            //按照批次找到集成明细;
             List<Record> salesOrderLines1=Db.find("select  ptl.*,pt.BATCH_NUM as batch_num from pool_batch_line ptl,pool_batch pt  where pt.id=ptl.POOL_BATCH_ID    and ptl.POOL_BATCH_ID=?",task.getStr("id"));
 
             Record r=new Record();
@@ -885,16 +897,20 @@ public class OrderService {
             r.set("sapSupplierID",task.getStr("sapSupplierID"));
 
             List<Record> salesOrderLines=new ArrayList<>();
-
+            Map map=new HashMap();
             for (Record r11:salesOrderLines1
             ) {
 
-                 List<Record> ass=Db.find("SELECT    ptl.id  from pool_task_line ptl where   ptl.agentType=? and  ptl.sAPSupplierID=? and ptl.product_no=?   and  ptl.batch_num =?",r11.getStr("agentType") ,r11.getStr("sapSupplierID"),r11.getStr("PRODUCT_ID"),r11.getStr("batch_num"));
+               List<Record> ass=Db.find("SELECT    ptl.id  from pool_task_line ptl where   ptl.agentType=? and ptl.priceSum>0 and  ptl.sAPSupplierID=? and ptl.product_no=?   and  ptl.batch_num =?",r11.getStr("agentType") ,r11.getStr("sapSupplierID"),r11.getStr("PRODUCT_ID"),r11.getStr("batch_num"));
                 log.info("交货参数2"+(null==ass?"":ass.toString()));
                 //BigDecimal a=new BigDecimal(0);
                 float a=0;
                  if(null!=ass){
                      for (Record as:ass ) {
+                         if(null!=map.get(as.getStr("id"))){
+                             continue;
+                         }
+                         map.put(as.getStr("id"),as.getStr("id"));
                          Record ar = Db.findFirst("select  IFNULL(ptlm.amount,0)as amount  from     pool_task_line_money  ptlm where    ptlm.userType=2 and      ptlm.line_id=?", as.getStr("id"));
                          log.info("交货参数" + (null == ar ? "" : ar.toString()));
                          if (null != ar) {
@@ -905,7 +921,7 @@ public class OrderService {
                      }
                 }
 
-            Record r1=new Record();
+                Record r1=new Record();
                 r1.set("omsOrderNo",task.getStr("ERP_NO"));
                 r1.set("omsSourceNo",task.getStr("BATCH_NUM"));
                 r1.set("costingCode1","");
@@ -917,8 +933,6 @@ public class OrderService {
                 r1.set("whsCode",r11.getStr("whareHouse"));
                 r1.set("price",a);//交货 2 供应商
                 r1.set("quantity",r11.getInt("AMOUNT"));
-
-
                 salesOrderLines.add(r1);
             }
             r.set("salesDeliveryLines",salesOrderLines);
