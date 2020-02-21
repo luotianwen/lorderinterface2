@@ -15,9 +15,9 @@ public class OrderKCBatchTask implements Runnable {
     static OrderService orderService = Aop.get(OrderService.class);
     @Override
     public void run() {
-        log.info("OrderBatchTask  begin");
+        log.info("OrderKCBatchTask  begin");
         orderService.b2bbatchkc();
-        log.info("OrderBatchTask end");
+        log.info("OrderKCBatchTask end");
 
     }
 }

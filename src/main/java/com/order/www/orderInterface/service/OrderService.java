@@ -140,7 +140,7 @@ public class OrderService {
      */
     public void b2bbatch() {
         List<Record> ots = Db.find("select DISTINCT(pt.id)as id,pt.task_type as orderclass , pt.agentType ,pt.shipperID, pt.sapSupplierID  from pool_task pt,pool_task_line ptl " +
-                "where pool_task_id=pt.id and  pt.task_type='1' and  pt.consignee_phone not in(select phone from pool_black )  and  ptl.batch_num is null  and date(pt.send_store_datetime)=date(now())");
+                "where pool_task_id=pt.id and  pt.task_type='1' and  pt.consignee_phone not in(select phone from pool_black )  and  ptl.batch_num is null  and pt.send_store_datetime is not null");
 
           //读取前一天的订单数据
         for (Record r : ots
@@ -247,7 +247,7 @@ public class OrderService {
     public void b2cWarhouse(String product_Class) {
         //门店交货的不需要做SAP销售订单和销售交货 and  pt.sale_group='2'
         List<Record> ots = Db.find("select ptl.product_no as no , pt.agentType , pt.sapSupplierID,pt.shipperID ,pt.sale_group as shipperType,pt.task_type as orderclass,sum(ptl.amount) amount from pool_task pt,pool_task_line ptl " +
-                "where pool_task_id=pt.id and  pt.task_type='0' and  pt.consignee_phone not in(select phone from pool_black )  and  pt.sale_group='2' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and date(pt.send_store_datetime)=date(now())" +
+                "where pool_task_id=pt.id and  pt.task_type='0' and  pt.consignee_phone not in(select phone from pool_black )  and  pt.sale_group='2' and ptl.product_Class='" + product_Class + "' and  ptl.batch_num is null and pt.send_store_datetime is not null " +
                 "GROUP BY    ptl.product_no,pt.agentType,pt.sapSupplierID,pt.shipperID,pt.sale_group ");
 
         Date currentTime = new Date();
