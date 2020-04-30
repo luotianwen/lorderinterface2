@@ -9,6 +9,7 @@ import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
 import com.jfinal.plugin.activerecord.Record;
+import com.order.www.orderInterface.common.OrderStatic;
 import com.order.www.orderInterface.entity.*;
 import com.order.www.orderInterface.service.OrderService;
 import top.hequehua.swagger.annotation.*;
@@ -16,7 +17,10 @@ import top.hequehua.swagger.config.DataType;
 import top.hequehua.swagger.config.RequestMethod;
 
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
 
@@ -344,6 +348,57 @@ public class OrderController extends Controller {
 	public void index() {
 		String name=getPara("userName");
 		renderJson(Ret.ok("msg","测试成功！").set("userName", name));
+	}
+	@ApiOperation(tags="获取商品可用库存", methods= RequestMethod.GET,produces = "application/json",description ="获取商品可用库存" )
+	 @ApiParams({
+			@ApiParam(name="itemCode",required=false,description="物料号")
+	})
+	@ApiResponses({
+			@ApiResponse(code ="state",message = "状态 ok 为成功")
+
+	})
+	public void getStock() {
+		String itemCode=getPara("itemCode");
+		List<String> ls=new ArrayList();
+		ls.add(itemCode);
+		String json = OrderStatic.lxdpostJson(OrderStatic.GetItemCodeOccupyStock, JSON.toJSON(ls).toString());
+		Detail orderReturn= JSON.parseObject(json, Detail.class);
+		int laststock=0;
+		Record re=new Record();
+		Map map=new HashMap ();
+		map.put("Status",0);
+		map.put("Msg","成功");
+		if(orderReturn.getStatus()==200){
+			List<Detail.ResultBean> rbs=orderReturn.getResult();
+			for(Detail.ResultBean b:rbs){
+				int num=b.getNum();
+				re.set("PlatformOccupyStock",num);
+				StockReData sd=orderService.getSapStockByItemCode(itemCode.trim());
+				int stock=0;
+				if(sd!=null&&sd.getData()!=null&&sd.getData().size()>0){
+					List<StockReData.DataBean> dbs=sd.getData();
+					for (StockReData.DataBean sd1:dbs
+					) {
+						stock+=sd1.getQuantity();
+					}
+				}
+				re.set("SapStock",stock);
+				int omsstock=0;
+				Record r= orderService.getOmsStock(itemCode);
+				omsstock=r.getInt("omsstock");
+				laststock=stock-num-omsstock;
+				re.set("OmsOccupyStock",omsstock);
+				re.set("Laststock",laststock);
+				map.put("Result",re);
+			}
+
+		}
+		else{
+			map.put("Status",1);
+			map.put("Msg","失败");
+		}
+
+		renderJson(map);
 	}
 }
 

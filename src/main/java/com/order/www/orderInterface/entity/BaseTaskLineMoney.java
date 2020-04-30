@@ -59,6 +59,47 @@ public abstract class BaseTaskLineMoney<M extends BaseTaskLineMoney<M>> extends 
 		return getStr("name");
 	}
 
+
+	public void setAmountType(int typeName) {
+		set("amountType", typeName);
+	}
+
+	public int getAmountType() {
+		return getInt("amountType");
+	}
+
+
+
+	public void setTransferType(int typeName) {
+		set("transferType", typeName);
+	}
+
+	public int getTransferType() {
+		return getInt("transferType");
+	}
+
+	public void setAccountName(java.lang.String typeName) {
+		set("accountName", typeName);
+	}
+
+	public java.lang.String getAccountName() {
+		return getStr("accountName");
+	}
+	public void setAccountNumber(java.lang.String typeName) {
+		set("accountNumber", typeName);
+	}
+
+	public java.lang.String getAccountNumber() {
+		return getStr("accountNumber");
+	}
+	public void setBankName(java.lang.String bankName) {
+		set("bankName", bankName);
+	}
+
+	public java.lang.String getBankName() {
+		return getStr("bankName");
+	}
+
 	/**
 	 * 分账金额
 	 */

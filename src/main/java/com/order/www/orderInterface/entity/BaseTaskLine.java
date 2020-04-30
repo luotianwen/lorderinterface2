@@ -61,6 +61,25 @@ public abstract class BaseTaskLine<M extends BaseTaskLine<M>> extends Model<M> i
 		return get("payAmountSum");
 	}
 
+
+
+	public void setAccountNumber(java.lang.String id) {
+		set("accountNumber", id);
+	}
+
+	public java.lang.String getAccountNumber() {
+		return getStr("accountNumber");
+	}
+	public void setBankName(java.lang.String id) {
+		set("bankName", id);
+	}
+
+	public java.lang.String getBankName() {
+		return getStr("bankName");
+	}
+
+
+
 	/**
 	 * 供应商id
 	 */

@@ -113,6 +113,52 @@ public class TransferData {
         private int userID;
         private String name;
 
+        private String  accountName;
+        private String accountNumber;
+        private String bankName;
+        private int amountType;
+        private int  transferType;
+
+        public String getAccountName() {
+            return accountName;
+        }
+
+        public void setAccountName(String accountName) {
+            this.accountName = accountName;
+        }
+
+        public String getAccountNumber() {
+            return accountNumber;
+        }
+
+        public void setAccountNumber(String accountNumber) {
+            this.accountNumber = accountNumber;
+        }
+
+        public String getBankName() {
+            return bankName;
+        }
+
+        public void setBankName(String bankName) {
+            this.bankName = bankName;
+        }
+
+        public int getAmountType() {
+            return amountType;
+        }
+
+        public void setAmountType(int amountType) {
+            this.amountType = amountType;
+        }
+
+        public int getTransferType() {
+            return transferType;
+        }
+
+        public void setTransferType(int transferType) {
+            this.transferType = transferType;
+        }
+
         public int getUserID() {
             return userID;
         }

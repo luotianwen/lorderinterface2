@@ -10,9 +10,10 @@ public class SapTask  implements Runnable {
     @Override
     public void run() {
         log.info("SapTask  begin");
+        orderService.updaCku();
          orderService.sapOrder();
-        orderService.sapProfit();
-        orderService.sapDelivery();
+         orderService.sapProfit();
+         orderService.sapDelivery();
         log.info("SapTask  end");
     }
 }

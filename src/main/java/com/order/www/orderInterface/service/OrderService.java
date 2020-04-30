@@ -76,10 +76,10 @@ public class OrderService {
                 if (null != sr && sr.getCode().equals("0") && sr.getData().size() > 0) {
                     int k=0;
                     for (StockReData.DataBean d:sr.getData()){
-                        if(d.getQuantity()>k){
-                            k=d.getQuantity();
+                        //if(d.getQuantity()>k){
+                            k+=d.getQuantity();
                             ck=d.getWharehouse();
-                        }
+                        //}
                     }
                     sjkc = k;
                     //ck = sr.getData().get(0).getWharehouse();
@@ -108,7 +108,7 @@ public class OrderService {
                    continue;
                 }
                else {
-                    String finalCk = ck;
+                    String finalCk ="A16";
                     Db.tx(() -> {
                         Db.update("update pool_task  set haveAmount='1' where id=?", tl.getPoolTaskId());
                         Db.update("update pool_task_line set  whareHouse=? where id=?", finalCk, tl.getId());
@@ -205,7 +205,7 @@ public class OrderService {
                 Db.tx(() -> {
                     bl.save();
                     //Db.update("update pool_task  set haveAmount='1' where id=?", tl.getPoolTaskId());
-                    Db.update("update pool_task_line set batch_num =?,whareHouse=? where id=?", no, finalCk, tl.getId());
+                    Db.update("update pool_task_line set batch_num =? where id=?", no,  tl.getId());
                     return true;
                 });
             }
@@ -236,9 +236,9 @@ public class OrderService {
     }
 
 
-    private StockReData getSapStockByItemCode(String itemCode){
+    public StockReData getSapStockByItemCode(String itemCode){
 
-        String json=OrderStatic.get(OrderStatic.salesstock+itemCode);
+        String json=OrderStatic.get(OrderStatic.salesstock+itemCode.trim());
         log.info(itemCode+"库存+"+json);
 
         StockReData sr=JSON.parseObject(json,StockReData.class);
@@ -515,7 +515,7 @@ public class OrderService {
         for (TransferData transferData : orderReturns
         ) {
             List<TransferData.ItemBean> ibs = transferData.getItem();
-            TaskLine tl = TaskLine.dao.findFirst("select id from pool_task_line where  product_class in('1','3','5') and task_no=? and product_no=? and priceSum=?", transferData.getOrderID(), transferData.getItemCode(),transferData.getAmount());
+            TaskLine tl = TaskLine.dao.findFirst("select id from pool_task_line where    task_no=? and product_no=? and priceSum=?", transferData.getOrderID(), transferData.getItemCode(),transferData.getAmount());
             if (null == tl) {
                 continue;
             }
@@ -524,6 +524,9 @@ public class OrderService {
                 String id = UUID.randomUUID().toString().replaceAll("-", "");
                 TaskLineMoney tm = new TaskLineMoney();
                 tm.setId(id);
+
+                tm.setAmountType(ib.getAmountType());
+
                 tm.setLineId(tl.getId());
                 tm.setAmount(ib.getAmount());
                 tm.setProportion(ib.getProportion());
@@ -531,6 +534,11 @@ public class OrderService {
                 tm.setUserType(ib.getUserType());
                 tm.setUserID(ib.getUserID());
                 tm.setName(ib.getName());
+
+                tm.setAccountName(ib.getAccountName());
+                tm.setBankName(ib.getBankName());
+                tm.setTransferType(ib.getTransferType());
+                tm.setAccountNumber(ib.getAccountNumber());
                 tm.save();
 
             }
@@ -542,15 +550,19 @@ public class OrderService {
         for ( SubReqData.DataBean sds:searchData.getData()
              ) {
             if (sds.isSuccess()) {
+
 //物流状态: 0-无轨迹，1-已揽收，2-在途中，3-签收,4-问题件
-                if ("3" == sds.getState()) {
-                    Db.update("update pool_task  set recall_status=? where carriers like '%?%'", "1", sds.getLogisticCode());
-                } else if ("4" == sds.getState()) {
-                    Db.update("update pool_task  set recall_status=? where carriers like '%?%'", "2", sds.getLogisticCode());
+                if ("3".equals(sds.getState())) {
+
+                    Db.update("update pool_task  set recall_status=1,sign_result=1 where carriers  like concat('%', ?, '%')",  sds.getLogisticCode());
+                } else if ("4".equals(sds.getState())) {
+                    Db.update("update pool_task  set recall_status=2,sign_result=1 where carriers like concat('%', ?, '%')",   sds.getLogisticCode());
                 }
                 //String id = UUID.randomUUID().toString().replace("-", "");
                 //log.info(JSON.toJSONString(sds));
                // Db.update("insert into pool_logistic values(?,?,?,?)", id, sds.getLogisticCode(), JSON.toJSONString(sds), new Date());
+                String json = OrderStatic.lxdpostJson(OrderStatic.GetOrderLogisticsInfo, JSON.toJSONString(sds));
+                log.info("推送物流信息"+json);
             }
         }
 
@@ -759,10 +771,10 @@ public class OrderService {
      * 凭单接口
      */
     public void sapProfit() {
-        List<Record> tasklist = Db.find("select DISTINCT pt.id ,pt.task_no from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where    (ptlm.userType=3  or (ptlm.userType=2 and ptlm.userID=0)) and  pt.consignee_phone not in(select phone from pool_black ) and     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null");
+        List<Record> tasklist = Db.find("select DISTINCT pt.id ,pt.task_no from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where    (ptlm.userType=3  or (ptlm.userType=2 and ptlm.userID=0)) and  pt.consignee_phone not in(select phone from pool_black ) and     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok  is null ");
         for (Record task : tasklist
         ) {
-            List<Record> list = Db.find("select pt.task_no as platNo,pt.task_type as orderClass ,ptl.product_class as productType,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName,  ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id ,ptlm.userType from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where  (ptlm.userType=3  or (ptlm.userType=2 and ptlm.userID=0)) and  pt.consignee_phone not in(select phone from pool_black ) and    pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is  null and pt.id=?", task.getStr("id"));
+            List<Record> list = Db.find("select pt.task_no as platNo,pt.task_type as orderClass ,ptl.product_class as productType,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName,  ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id ,ptlm.userType from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where  (ptlm.userType=3  or (ptlm.userType=2 and ptlm.userID=0)) and  pt.consignee_phone not in(select phone from pool_black ) and    pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is null and pt.id=?", task.getStr("id"));
             String param=JsonKit.toJson(list);
             String json = OrderStatic.post(OrderStatic.journal,param);
             log.info("凭单接口参数"+param);
@@ -832,12 +844,12 @@ public class OrderService {
             r.set("salesOrderLines",salesOrderLines);
             String param= JsonKit.toJson(r);
             String json = OrderStatic.post(OrderStatic.salesorder,param);
-            //System.out.println(json);
+             System.out.println(param);
             log.info("销售订单接口参数"+param);
             ResponseEntity responseEntity = JSON.parseObject(json, ResponseEntity.class);
             log.info("销售订单接口结果"+JsonKit.toJson(responseEntity));
-           // System.out.println(JsonKit.toJson(responseEntity));
-            if (responseEntity.getCode() == 0) {
+           System.out.println(JsonKit.toJson(responseEntity));
+            if (responseEntity.getCode() == 0&&responseEntity.getStatus() == 0) {
                 try {
                     Db.tx(() -> {
                         for (Record r1 : tasklist
@@ -858,6 +870,7 @@ public class OrderService {
                 }
             }
             else{
+
                 log.error("销售订单接口参数"+param);
                 log.error("销售订单接口结果"+JsonKit.toJson(responseEntity));
             }
@@ -869,7 +882,7 @@ public class OrderService {
      */
     public void sapDelivery() {
         //所有没交货的
-        List<Record> tasklist = Db.find("select *  from   pool_batch  where    isok is  null");
+        List<Record> tasklist = Db.find("select *  from   pool_batch  where    isok ='0'");
 
         List<Record> list=new ArrayList<>();
         List<Record> list2=new ArrayList<>();
@@ -978,5 +991,16 @@ public class OrderService {
         }
         carriers=r.getStr("name")+" "+logisticsNum;
         Db.update("UPDATE pool_task SET omsstatus='5', carriers =?, send_way =2, task_status='3', isThree=1, send_store_datetime = now() where task_no=?",carriers,orderID);
+    }
+
+    public Record getOmsStock(String itemCode) {
+       return  Db.findFirst("select(select IFNULL(sum(bl.AMOUNT),0) as AMOUNT " +
+               "from pool_batch ba, pool_batch_line bl where ba.id=bl.POOL_BATCH_ID and ba.isok ='0' and bl.PRODUCT_ID=?" +
+               ")+(SELECT IFNULL(sum(tl.amount),0)as amount from pool_task t, pool_task_line tl where t.id=tl.pool_task_id and " +
+               "tl.product_no=? and tl.batch_num is null)as omsstock  FROM dual",itemCode,itemCode);
+    }
+    @Before(Tx.class)
+    public void updaCku() {
+        Db.update("update pool_batch_line set whareHouse='A16' where whareHouse is null");
     }
 }
