@@ -25,8 +25,9 @@ public class OrderService {
      * 库存
      */
     public void b2bbatchkc() {
+        // and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY)
         List<Record> ots = Db.find("select DISTINCT(pt.id)as id,pt.task_type as orderclass , pt.agentType ,pt.shipperID, pt.sapSupplierID  from pool_task pt,pool_task_line ptl " +
-                "where pool_task_id=pt.id and  pt.task_type='1' and  pt.consignee_phone not in(select phone from pool_black )  and  (pt.haveAmount is null or pt.haveAmount='0')  and date(pt.task_gen_datetime)<= DATE_SUB(CURDATE(),INTERVAL 1 DAY)");
+                "where pool_task_id=pt.id and  pt.task_type='1' and  pt.consignee_phone not in(select phone from pool_black )  and  (pt.haveAmount is null or pt.haveAmount='0') ");
         for (Record r : ots
                 ) {
             List<TaskLine> tls = TaskLine.dao.getTls(r.getStr("id"));
