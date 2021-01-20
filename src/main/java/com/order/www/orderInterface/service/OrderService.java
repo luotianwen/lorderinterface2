@@ -772,10 +772,10 @@ public class OrderService {
      * 凭单接口
      */
     public void sapProfit() {
-        List<Record> tasklist = Db.find("select DISTINCT pt.id ,pt.task_no from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where    (ptlm.userType=3  or (ptlm.userType=2 and ptlm.userID=0)) and  pt.consignee_phone not in(select phone from pool_black ) and     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok  is null ");
+        List<Record> tasklist = Db.find("select DISTINCT pt.id ,pt.task_no from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where    (ptlm.userType=3 or ptlm.userType=8 or (ptlm.userType=2 and ptlm.userID=0)) and  pt.consignee_phone not in(select phone from pool_black ) and     pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok  is null ");
         for (Record task : tasklist
         ) {
-            List<Record> list = Db.find("select pt.task_no as platNo,pt.task_type as orderClass ,ptl.product_class as productType,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName,  ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id ,ptlm.userType from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where  (ptlm.userType=3  or (ptlm.userType=2 and ptlm.userID=0)) and  pt.consignee_phone not in(select phone from pool_black ) and    pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is null and pt.id=?", task.getStr("id"));
+            List<Record> list = Db.find("select pt.task_no as platNo,pt.task_type as orderClass ,ptl.product_class as productType,pt.pool_task_no as omsNo,pt.task_type as profitType,ptl.supplierID as shipperId,ptl.supplierName as shipperName,  ptl.product_class as shipperType , ptl.product_no as itemCode,ptlm.proportion as ratio,ptlm.amount,ptlm.id ,ptlm.userType from   pool_task pt, pool_task_line ptl, pool_task_line_money  ptlm where  (ptlm.userType=3 or ptlm.userType=8 or (ptlm.userType=2 and ptlm.userID=0)) and  pt.consignee_phone not in(select phone from pool_black ) and    pt.id=ptl.pool_task_id and ptl.id= ptlm.line_id and  ptlm.isok is null and pt.id=?", task.getStr("id"));
             String param=JsonKit.toJson(list);
             String json = OrderStatic.post(OrderStatic.journal,param);
             log.info("凭单接口参数"+param);
@@ -925,7 +925,7 @@ public class OrderService {
                              continue;
                          }
                          map.put(as.getStr("id"),as.getStr("id"));
-                         Record ar = Db.findFirst("select  IFNULL(ptlm.amount,0)as amount  from     pool_task_line_money  ptlm where    ptlm.userType=2 and      ptlm.line_id=?", as.getStr("id"));
+                         Record ar = Db.findFirst("select  IFNULL(ptlm.amount,0)as amount  from     pool_task_line_money  ptlm where   ( ptlm.userType=2 or ptlm.userType=8 ) and      ptlm.line_id=?", as.getStr("id"));
                          log.info("交货参数" + (null == ar ? "" : ar.toString()));
                          if (null != ar) {
                              a=a+ar.getFloat("amount");
