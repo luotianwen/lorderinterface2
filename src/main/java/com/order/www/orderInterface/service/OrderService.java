@@ -925,7 +925,7 @@ public class OrderService {
                              continue;
                          }
                          map.put(as.getStr("id"),as.getStr("id"));
-                         Record ar = Db.findFirst("select  IFNULL(ptlm.amount,0)as amount  from     pool_task_line_money  ptlm where   ( ptlm.userType=2 or ptlm.userType=8 ) and      ptlm.line_id=?", as.getStr("id"));
+                         Record ar = Db.findFirst("select  IFNULL(sum(ptlm.amount),0)as amount  from     pool_task_line_money  ptlm where   ( ptlm.userType=2 or ptlm.userType=8 ) and      ptlm.line_id=?", as.getStr("id"));
                          log.info("交货参数" + (null == ar ? "" : ar.toString()));
                          if (null != ar) {
                              a=a+ar.getFloat("amount");
